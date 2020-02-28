@@ -11,20 +11,19 @@ void matrix_init_user(void) {
 //tap dance
 //rules.mk (TAP_DANCE_ENABLE = yes)
 //config.h (#define TAPPING_TERM 170) double tap window 150-200
-enum custom_keycodes {
-	TD_LBRC,
-	TD_RBRC,
-	TD_CAPS,
-	TD_NP1,
-	TD_NP2,
-	TD_NP3,
-	TD_NP4,
-	TD_EMO,
+enum custom_keycodes {TD_LBRC,
+  TD_RBRC,
+  TD_CAPS,
+  TD_NP1,
+  TD_NP2,
+  TD_NP3,
+  TD_NP4,
+  TD_EMO,
   TD_DHO,
   TD_UEN,
   TD_UWU
 };
-
+// ' on tap layer 2 on hold Uwu on double tap
 typedef enum {
   SINGLE_TAP,
   SINGLE_HOLD,
@@ -40,7 +39,7 @@ int cur_dance (qk_tap_dance_state_t *state) {
         else { return SINGLE_HOLD; }
   }
   if (state->count == 2) { return DOUBLE_SINGLE_TAP; }
-  else { return 3; } // any number higher than the maximum state value you return above
+  else { return 3; }
 }
 void tduwu_finished (qk_tap_dance_state_t *state, void *user_date) {
   td_state = cur_dance(state);
@@ -52,10 +51,9 @@ void tduwu_finished (qk_tap_dance_state_t *state, void *user_date) {
       layer_on(2);
       break;
     case DOUBLE_SINGLE_TAP:
-      register_code16(KC_U);
+      send_string("UwU");
   }
 }
-
 void tduwu_reset (qk_tap_dance_state_t *state, void *user_data) {
   switch (td_state) {
     case SINGLE_TAP:
@@ -65,10 +63,9 @@ void tduwu_reset (qk_tap_dance_state_t *state, void *user_data) {
       layer_off(2);
       break;
     case DOUBLE_SINGLE_TAP:
-      unregister_code16(KC_U);
+      unregister_code16(KC_DOT);
   }
 }
-
 // ¯\_(ツ)_/¯ on tap UwU on double tap
 void TDEMO (qk_tap_dance_state_t *state, void *user_data) {
 	switch(state->count){
