@@ -24,7 +24,7 @@ enum custom_keycodes {
   TD_UEN,
   TD_UWU
 };
-// ' on tap layer 2 on hold Uwu on double tap
+
 typedef enum {
   SINGLE_TAP,
   SINGLE_HOLD,
