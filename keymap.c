@@ -20,58 +20,9 @@ enum custom_keycodes {TD_LBRC,
   TD_NP4,
   TD_EMO1,
   TD_DHO,
-  TD_UEN,
-  TD_EMO2
-//  TD_UWU
+  TD_UEN
 };
-
-/* tap dance hold example
-// ' on tap layer 2 on hold Uwu on double tap
-typedef enum {
-  SINGLE_TAP,
-  SINGLE_HOLD,
-  DOUBLE_SINGLE_TAP
-} td_state_t;
-static td_state_t td_state;
-int cur_dance (qk_tap_dance_state_t *state);
-void tduwu_finished (qk_tap_dance_state_t *state, void *user_data);
-void tduwu_reset (qk_tap_dance_state_t *state, void *user_data);
-int cur_dance (qk_tap_dance_state_t *state) {
-  if (state->count == 1) {
-    if (state->interrupted || !state->pressed) { return SINGLE_TAP; }
-      else { return SINGLE_HOLD; }
-  }
-  if (state->count == 2) { return DOUBLE_SINGLE_TAP; }
-  else { return 3; }
-}
-void tduwu_finished (qk_tap_dance_state_t *state, void *user_date) {
-  td_state = cur_dance(state);
-  switch (td_state) {
-    case SINGLE_TAP:
-      register_code16(KC_QUOT);
-      break;
-    case SINGLE_HOLD:
-      layer_on(2);
-      break;
-    case DOUBLE_SINGLE_TAP:
-      send_string("UwU");
-  }
-}
-void tduwu_reset (qk_tap_dance_state_t *state, void *user_data) {
-  switch (td_state) {
-    case SINGLE_TAP:
-      unregister_code(KC_QUOT);
-      break;
-    case SINGLE_HOLD:
-      layer_off(2);
-      break;
-    case DOUBLE_SINGLE_TAP:
-      unregister_code16(KC_TRNS);
-  }
-}
-*/
-
-// ¯\_(ツ)_/¯ on tap UwU on double tap
+// ¯\_(ツ)_/¯ on tap, UwU on double tap
 void TDEMO1 (qk_tap_dance_state_t *state, void *user_data) {
   switch(state->count){
     case 1:
@@ -79,15 +30,6 @@ void TDEMO1 (qk_tap_dance_state_t *state, void *user_data) {
       break;
     case 2:
       send_string("UwU");
-    }
-}
-void TDEMO2 (qk_tap_dance_state_t *state, void *user_data) {
-  switch(state->count){
-    case 1:
-      send_unicode_string("(╯°□°)╯︵ ┻━┻");
-      break;
-    case 2:
-      send_unicode_string("┬─┬ノ(°_°ノ)");
     }
 }
 qk_tap_dance_action_t tap_dance_actions[] = {
@@ -100,9 +42,7 @@ qk_tap_dance_action_t tap_dance_actions[] = {
   [TD_NP4] = ACTION_TAP_DANCE_DOUBLE(KC_4, KC_P4),
   [TD_EMO1] = ACTION_TAP_DANCE_FN(TDEMO1),
   [TD_DHO] = ACTION_TAP_DANCE_DOUBLE(KC_DOWN, KC_HOME),
-  [TD_UEN] = ACTION_TAP_DANCE_DOUBLE(KC_UP, KC_END),
-  [TD_EMO2] = ACTION_TAP_DANCE_FN(TDEMO2)
-//  [TD_UWU] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, tduwu_finished, tduwu_reset)
+  [TD_UEN] = ACTION_TAP_DANCE_DOUBLE(KC_UP, KC_END)
 };
 
 //combos
@@ -119,31 +59,6 @@ combo_t key_combos[COMBO_COUNT] = {
   [co_ep] = COMBO(ep_combo, KC_EXLM)
 };
 
-/*
-//macros (unused macros. left in as example)
-enum custom_keycodes{
-	SHRUG = SAFE_RANGE,
-	SMILE,
-};
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-	switch (keycode) {
-		case SHRUG:
-			if (record->event.pressed) {
-				send_unicode_hex_string("00AF 005C 005F 0028 30C4 0029 005F 002F 00AF");  //unicode
-			} else {
-			}
-			break;
-		case SMILE:
-			if (record->event.pressed) {
-				send_string(":]");
-			} else {
-			}
-			break;
-	}
-	return true;
-};
-*/
-
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*	Base Layer
 *	,-------------------------------------------------------------------------.
@@ -151,8 +66,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 *	|-------------------------------------------------------------------------+
 *	|Tab/L1|  A  |  S  |  D  |  F  |  G  |  H  |  J  |  K  |  L  |  ;  | '/L2 |
 *	|-------------------------------------------------------------------------+
-*	| Shift |  Z  |  X  |  C  |  V  |  B  |  N  |M(?) |,(?!)|.(!) |emote| Ent | combo (m+,)=! combo (,+.)=?
-*	|-------------------------------------------------------------------------+ tap dance emote ¯\_(ツ)_/¯ UwU
+*	| Shift |  Z  |  X  |  C  |  V  |  B  |  N  |M(?) |,(?!)|.(!) |emote| Ent | combo (m+,)=! combo (,+.)=? tap dance emote ¯\_(ツ)_/¯, UwU
+*	|-------------------------------------------------------------------------+
 *	| Ctrl|  _  |=/Alt|  /  |   *  |   Space   |Del/L3| left|V(HO)|^(EN)|Right| tap dance down(home) up(end)
 *	`-------------------------------------------------------------------------'
 */
@@ -167,14 +82,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 *	|-------------------------------------------------------------------------+
 *	|      |     |     |     |     |     |     |     |     |     |     |  \   |
 *	|-------------------------------------------------------------------------+
-*	|       |     |     |     |     |     |     |     |     |     |emote|     | tap dance emote (╯°□°)╯︵ ┻━┻ ┬─┬ノ(°_°ノ))
+*	|       |     |     |     |     |     |     |     |     |     |     |     |
 *	|-------------------------------------------------------------------------+
 *	|     |  @  |     |  -  |  +   |          |       | Home| PgDn| PgUp| End |
 *	`-------------------------------------------------------------------------'
 */
 	[1] = LAYOUT(KC_GRV, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, TD(TD_LBRC), TD(TD_RBRC), KC_TRNS,
 		KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_BSLS,
-		KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, TD(TD_EMO2), KC_TRNS,
+		KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
 		KC_TRNS, KC_AT, KC_TRNS, KC_PMNS, KC_PPLS, KC_TRNS, KC_TRNS, KC_HOME, KC_PGDN, KC_PGUP, KC_END),
 /*
 *	Layer 2 '
