@@ -1,0 +1,89 @@
+   1               		.file	"ut472.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.matrix_init_kb,"ax",@progbits
+  11               	.global	matrix_init_kb
+  13               	matrix_init_kb:
+  14               	.LFB109:
+  15               		.file 1 "keyboards/ut472/ut472.c"
+   1:keyboards/ut472/ut472.c **** #include "ut472.h"
+   2:keyboards/ut472/ut472.c **** 
+   3:keyboards/ut472/ut472.c **** void matrix_init_kb(void) {
+  16               		.loc 1 3 27 view -0
+  17               		.cfi_startproc
+  18               	/* prologue: function */
+  19               	/* frame size = 0 */
+  20               	/* stack size = 0 */
+  21               	.L__stack_usage = 0
+   4:keyboards/ut472/ut472.c ****   // Keyboard start-up code goes here
+   5:keyboards/ut472/ut472.c ****   // Runs once when the firmware starts up
+   6:keyboards/ut472/ut472.c ****   matrix_init_user();
+  22               		.loc 1 6 3 view .LVU1
+  23 0000 0C94 0000 		jmp matrix_init_user
+  24               	.LVL0:
+  25               		.cfi_endproc
+  26               	.LFE109:
+  28               		.section	.text.matrix_scan_kb,"ax",@progbits
+  29               	.global	matrix_scan_kb
+  31               	matrix_scan_kb:
+  32               	.LFB110:
+   7:keyboards/ut472/ut472.c **** };
+   8:keyboards/ut472/ut472.c **** 
+   9:keyboards/ut472/ut472.c **** void matrix_scan_kb(void) {
+  33               		.loc 1 9 27 view -0
+  34               		.cfi_startproc
+  35               	/* prologue: function */
+  36               	/* frame size = 0 */
+  37               	/* stack size = 0 */
+  38               	.L__stack_usage = 0
+  10:keyboards/ut472/ut472.c ****   // Looping keyboard code goes here
+  11:keyboards/ut472/ut472.c ****   // This runs every cycle (a lot)
+  12:keyboards/ut472/ut472.c ****   matrix_scan_user();
+  39               		.loc 1 12 3 view .LVU3
+  40 0000 0C94 0000 		jmp matrix_scan_user
+  41               	.LVL1:
+  42               		.cfi_endproc
+  43               	.LFE110:
+  45               		.text
+  46               	.Letext0:
+  47               		.file 2 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+  48               		.file 3 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+  49               		.file 4 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../StdRequestType.h"
+  50               		.file 5 "tmk_core/common/action.h"
+  51               		.file 6 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../DeviceStandardReq.h"
+  52               		.file 7 "lib/lufa/LUFA/Drivers/USB/Core/USBTask.h"
+  53               		.file 8 "lib/lufa/LUFA/Drivers/USB/Core/HostStandardReq.h"
+  54               		.file 9 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+  55               		.file 10 "tmk_core/common/report.h"
+  56               		.file 11 "tmk_core/common/host.h"
+  57               		.file 12 "tmk_core/common/debug.h"
+  58               		.file 13 "quantum/keycode_config.h"
+  59               		.file 14 "quantum/keymap.h"
+  60               		.file 15 "./quantum/color.h"
+  61               		.file 16 "quantum/rgblight.h"
+  62               		.file 17 "tmk_core/common/action_layer.h"
+  63               		.file 18 "tmk_core/common/timer.h"
+  64               		.file 19 "tmk_core/common/action_util.h"
+  65               		.file 20 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchai
+  66               		.file 21 "quantum/process_keycode/process_unicode_common.h"
+  67               		.file 22 "quantum/process_keycode/process_tap_dance.h"
+  68               		.file 23 "quantum/quantum.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 ut472.c
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccGQkBmI.s:2      *ABS*:0000003e __SP_H__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccGQkBmI.s:3      *ABS*:0000003d __SP_L__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccGQkBmI.s:4      *ABS*:0000003f __SREG__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccGQkBmI.s:5      *ABS*:00000000 __tmp_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccGQkBmI.s:6      *ABS*:00000001 __zero_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccGQkBmI.s:13     .text.matrix_init_kb:00000000 matrix_init_kb
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccGQkBmI.s:31     .text.matrix_scan_kb:00000000 matrix_scan_kb
+
+UNDEFINED SYMBOLS
+matrix_init_user
+matrix_scan_user

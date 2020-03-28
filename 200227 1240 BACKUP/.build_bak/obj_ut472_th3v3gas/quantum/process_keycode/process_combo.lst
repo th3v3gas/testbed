@@ -1,0 +1,1335 @@
+   1               		.file	"process_combo.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.dump_key_buffer,"ax",@progbits
+  12               	dump_key_buffer:
+  13               	.LVL0:
+  14               	.LFB111:
+  15               		.file 1 "quantum/process_keycode/process_combo.c"
+   1:quantum/process_keycode/process_combo.c **** /* Copyright 2016 Jack Humbert
+   2:quantum/process_keycode/process_combo.c ****  *
+   3:quantum/process_keycode/process_combo.c ****  * This program is free software: you can redistribute it and/or modify
+   4:quantum/process_keycode/process_combo.c ****  * it under the terms of the GNU General Public License as published by
+   5:quantum/process_keycode/process_combo.c ****  * the Free Software Foundation, either version 2 of the License, or
+   6:quantum/process_keycode/process_combo.c ****  * (at your option) any later version.
+   7:quantum/process_keycode/process_combo.c ****  *
+   8:quantum/process_keycode/process_combo.c ****  * This program is distributed in the hope that it will be useful,
+   9:quantum/process_keycode/process_combo.c ****  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  10:quantum/process_keycode/process_combo.c ****  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  11:quantum/process_keycode/process_combo.c ****  * GNU General Public License for more details.
+  12:quantum/process_keycode/process_combo.c ****  *
+  13:quantum/process_keycode/process_combo.c ****  * You should have received a copy of the GNU General Public License
+  14:quantum/process_keycode/process_combo.c ****  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  15:quantum/process_keycode/process_combo.c ****  */
+  16:quantum/process_keycode/process_combo.c **** 
+  17:quantum/process_keycode/process_combo.c **** #include "print.h"
+  18:quantum/process_keycode/process_combo.c **** #include "process_combo.h"
+  19:quantum/process_keycode/process_combo.c **** 
+  20:quantum/process_keycode/process_combo.c **** __attribute__((weak)) combo_t key_combos[COMBO_COUNT] = {
+  21:quantum/process_keycode/process_combo.c **** 
+  22:quantum/process_keycode/process_combo.c **** };
+  23:quantum/process_keycode/process_combo.c **** 
+  24:quantum/process_keycode/process_combo.c **** __attribute__((weak)) void process_combo_event(uint8_t combo_index, bool pressed) {}
+  25:quantum/process_keycode/process_combo.c **** 
+  26:quantum/process_keycode/process_combo.c **** static uint16_t timer               = 0;
+  27:quantum/process_keycode/process_combo.c **** static uint8_t  current_combo_index = 0;
+  28:quantum/process_keycode/process_combo.c **** static bool     drop_buffer         = false;
+  29:quantum/process_keycode/process_combo.c **** static bool     is_active           = false;
+  30:quantum/process_keycode/process_combo.c **** static bool     b_combo_enable      = true;  // defaults to enabled
+  31:quantum/process_keycode/process_combo.c **** 
+  32:quantum/process_keycode/process_combo.c **** static uint8_t buffer_size = 0;
+  33:quantum/process_keycode/process_combo.c **** #ifdef COMBO_ALLOW_ACTION_KEYS
+  34:quantum/process_keycode/process_combo.c **** static keyrecord_t key_buffer[MAX_COMBO_LENGTH];
+  35:quantum/process_keycode/process_combo.c **** #else
+  36:quantum/process_keycode/process_combo.c **** static uint16_t key_buffer[MAX_COMBO_LENGTH];
+  37:quantum/process_keycode/process_combo.c **** #endif
+  38:quantum/process_keycode/process_combo.c **** 
+  39:quantum/process_keycode/process_combo.c **** static inline void send_combo(uint16_t action, bool pressed) {
+  40:quantum/process_keycode/process_combo.c ****     if (action) {
+  41:quantum/process_keycode/process_combo.c ****         if (pressed) {
+  42:quantum/process_keycode/process_combo.c ****             register_code16(action);
+  43:quantum/process_keycode/process_combo.c ****         } else {
+  44:quantum/process_keycode/process_combo.c ****             unregister_code16(action);
+  45:quantum/process_keycode/process_combo.c ****         }
+  46:quantum/process_keycode/process_combo.c ****     } else {
+  47:quantum/process_keycode/process_combo.c ****         process_combo_event(current_combo_index, pressed);
+  48:quantum/process_keycode/process_combo.c ****     }
+  49:quantum/process_keycode/process_combo.c **** }
+  50:quantum/process_keycode/process_combo.c **** 
+  51:quantum/process_keycode/process_combo.c **** static inline void dump_key_buffer(bool emit) {
+  16               		.loc 1 51 47 view -0
+  17               		.cfi_startproc
+  18               		.loc 1 51 47 is_stmt 0 view .LVU1
+  19 0000 CF93      		push r28
+  20               	.LCFI0:
+  21               		.cfi_def_cfa_offset 3
+  22               		.cfi_offset 28, -2
+  23               	/* prologue: function */
+  24               	/* frame size = 0 */
+  25               	/* stack size = 1 */
+  26               	.L__stack_usage = 1
+  52:quantum/process_keycode/process_combo.c ****     if (buffer_size == 0) {
+  27               		.loc 1 52 5 is_stmt 1 view .LVU2
+  28               		.loc 1 52 8 is_stmt 0 view .LVU3
+  29 0002 9091 0000 		lds r25,buffer_size
+  30 0006 9923      		tst r25
+  31 0008 01F0      		breq .L1
+  32               	.LVL1:
+  33               	.LBB9:
+  34               	.LBI9:
+  51:quantum/process_keycode/process_combo.c ****     if (buffer_size == 0) {
+  35               		.loc 1 51 20 is_stmt 1 view .LVU4
+  36               	.LBB10:
+  53:quantum/process_keycode/process_combo.c ****         return;
+  54:quantum/process_keycode/process_combo.c ****     }
+  55:quantum/process_keycode/process_combo.c **** 
+  56:quantum/process_keycode/process_combo.c ****     if (emit) {
+  37               		.loc 1 56 5 view .LVU5
+  38               		.loc 1 56 8 is_stmt 0 view .LVU6
+  39 000a 8111      		cpse r24,__zero_reg__
+  40 000c 00C0      		rjmp .L6
+  41               	.LVL2:
+  42               	.L5:
+  57:quantum/process_keycode/process_combo.c ****         for (uint8_t i = 0; i < buffer_size; i++) {
+  58:quantum/process_keycode/process_combo.c **** #ifdef COMBO_ALLOW_ACTION_KEYS
+  59:quantum/process_keycode/process_combo.c ****             const action_t action = store_or_get_action(key_buffer[i].event.pressed, key_buffer[i].
+  60:quantum/process_keycode/process_combo.c ****             process_action(&(key_buffer[i]), action);
+  61:quantum/process_keycode/process_combo.c **** #else
+  62:quantum/process_keycode/process_combo.c ****             register_code16(key_buffer[i]);
+  63:quantum/process_keycode/process_combo.c ****             send_keyboard_report();
+  64:quantum/process_keycode/process_combo.c **** #endif
+  65:quantum/process_keycode/process_combo.c ****         }
+  66:quantum/process_keycode/process_combo.c ****     }
+  67:quantum/process_keycode/process_combo.c **** 
+  68:quantum/process_keycode/process_combo.c ****     buffer_size = 0;
+  43               		.loc 1 68 5 is_stmt 1 view .LVU7
+  44               		.loc 1 68 17 is_stmt 0 view .LVU8
+  45 000e 1092 0000 		sts buffer_size,__zero_reg__
+  46               	.LVL3:
+  47               	.L1:
+  48               	/* epilogue start */
+  49               		.loc 1 68 17 view .LVU9
+  50               	.LBE10:
+  51               	.LBE9:
+  69:quantum/process_keycode/process_combo.c **** }
+  52               		.loc 1 69 1 view .LVU10
+  53 0012 CF91      		pop r28
+  54 0014 0895      		ret
+  55               	.LVL4:
+  56               	.L4:
+  57               	.LBB13:
+  58               	.LBB12:
+  59               	.LBB11:
+  62:quantum/process_keycode/process_combo.c ****             send_keyboard_report();
+  60               		.loc 1 62 13 is_stmt 1 view .LVU11
+  61 0016 EC2F      		mov r30,r28
+  62 0018 F0E0      		ldi r31,0
+  63 001a EE0F      		lsl r30
+  64 001c FF1F      		rol r31
+  65 001e E050      		subi r30,lo8(-(key_buffer))
+  66 0020 F040      		sbci r31,hi8(-(key_buffer))
+  67 0022 8081      		ld r24,Z
+  68 0024 9181      		ldd r25,Z+1
+  69 0026 0E94 0000 		call register_code16
+  70               	.LVL5:
+  63:quantum/process_keycode/process_combo.c **** #endif
+  71               		.loc 1 63 13 view .LVU12
+  72 002a 0E94 0000 		call send_keyboard_report
+  73               	.LVL6:
+  57:quantum/process_keycode/process_combo.c **** #ifdef COMBO_ALLOW_ACTION_KEYS
+  74               		.loc 1 57 47 is_stmt 0 view .LVU13
+  75 002e CF5F      		subi r28,lo8(-(1))
+  76               	.LVL7:
+  77               	.L3:
+  57:quantum/process_keycode/process_combo.c **** #ifdef COMBO_ALLOW_ACTION_KEYS
+  78               		.loc 1 57 9 view .LVU14
+  79 0030 8091 0000 		lds r24,buffer_size
+  80 0034 C817      		cp r28,r24
+  81 0036 00F0      		brlo .L4
+  82 0038 00C0      		rjmp .L5
+  83               	.LVL8:
+  84               	.L6:
+  57:quantum/process_keycode/process_combo.c **** #ifdef COMBO_ALLOW_ACTION_KEYS
+  85               		.loc 1 57 22 view .LVU15
+  86 003a C0E0      		ldi r28,0
+  87 003c 00C0      		rjmp .L3
+  88               	.LBE11:
+  89               	.LBE12:
+  90               	.LBE13:
+  91               		.cfi_endproc
+  92               	.LFE111:
+  94               		.section	.text.process_combo_event,"ax",@progbits
+  95               		.weak	process_combo_event
+  97               	process_combo_event:
+  98               	.LVL9:
+  99               	.LFB109:
+  24:quantum/process_keycode/process_combo.c **** 
+ 100               		.loc 1 24 83 is_stmt 1 view -0
+ 101               		.cfi_startproc
+ 102               	/* prologue: function */
+ 103               	/* frame size = 0 */
+ 104               	/* stack size = 0 */
+ 105               	.L__stack_usage = 0
+  24:quantum/process_keycode/process_combo.c **** 
+ 106               		.loc 1 24 84 view .LVU17
+ 107               	/* epilogue start */
+  24:quantum/process_keycode/process_combo.c **** 
+ 108               		.loc 1 24 1 is_stmt 0 view .LVU18
+ 109 0000 0895      		ret
+ 110               		.cfi_endproc
+ 111               	.LFE109:
+ 113               		.section	.text.matrix_scan_combo,"ax",@progbits
+ 114               	.global	matrix_scan_combo
+ 116               	matrix_scan_combo:
+ 117               	.LFB114:
+  70:quantum/process_keycode/process_combo.c **** 
+  71:quantum/process_keycode/process_combo.c **** #define ALL_COMBO_KEYS_ARE_DOWN (((1 << count) - 1) == combo->state)
+  72:quantum/process_keycode/process_combo.c **** #define KEY_STATE_DOWN(key)         \
+  73:quantum/process_keycode/process_combo.c ****     do {                            \
+  74:quantum/process_keycode/process_combo.c ****         combo->state |= (1 << key); \
+  75:quantum/process_keycode/process_combo.c ****     } while (0)
+  76:quantum/process_keycode/process_combo.c **** #define KEY_STATE_UP(key)            \
+  77:quantum/process_keycode/process_combo.c ****     do {                             \
+  78:quantum/process_keycode/process_combo.c ****         combo->state &= ~(1 << key); \
+  79:quantum/process_keycode/process_combo.c ****     } while (0)
+  80:quantum/process_keycode/process_combo.c **** 
+  81:quantum/process_keycode/process_combo.c **** static bool process_single_combo(combo_t *combo, uint16_t keycode, keyrecord_t *record) {
+  82:quantum/process_keycode/process_combo.c ****     uint8_t count = 0;
+  83:quantum/process_keycode/process_combo.c ****     uint8_t index = -1;
+  84:quantum/process_keycode/process_combo.c ****     /* Find index of keycode and number of combo keys */
+  85:quantum/process_keycode/process_combo.c ****     for (const uint16_t *keys = combo->keys;; ++count) {
+  86:quantum/process_keycode/process_combo.c ****         uint16_t key = pgm_read_word(&keys[count]);
+  87:quantum/process_keycode/process_combo.c ****         if (keycode == key) index = count;
+  88:quantum/process_keycode/process_combo.c ****         if (COMBO_END == key) break;
+  89:quantum/process_keycode/process_combo.c ****     }
+  90:quantum/process_keycode/process_combo.c **** 
+  91:quantum/process_keycode/process_combo.c ****     /* Continue processing if not a combo key */
+  92:quantum/process_keycode/process_combo.c ****     if (-1 == (int8_t)index) return false;
+  93:quantum/process_keycode/process_combo.c **** 
+  94:quantum/process_keycode/process_combo.c ****     bool is_combo_active = is_active;
+  95:quantum/process_keycode/process_combo.c **** 
+  96:quantum/process_keycode/process_combo.c ****     if (record->event.pressed) {
+  97:quantum/process_keycode/process_combo.c ****         KEY_STATE_DOWN(index);
+  98:quantum/process_keycode/process_combo.c **** 
+  99:quantum/process_keycode/process_combo.c ****         if (is_combo_active) {
+ 100:quantum/process_keycode/process_combo.c ****             if (ALL_COMBO_KEYS_ARE_DOWN) { /* Combo was pressed */
+ 101:quantum/process_keycode/process_combo.c ****                 send_combo(combo->keycode, true);
+ 102:quantum/process_keycode/process_combo.c ****                 drop_buffer = true;
+ 103:quantum/process_keycode/process_combo.c ****             }
+ 104:quantum/process_keycode/process_combo.c ****         }
+ 105:quantum/process_keycode/process_combo.c ****     } else {
+ 106:quantum/process_keycode/process_combo.c ****         if (ALL_COMBO_KEYS_ARE_DOWN) { /* Combo was released */
+ 107:quantum/process_keycode/process_combo.c ****             send_combo(combo->keycode, false);
+ 108:quantum/process_keycode/process_combo.c ****         } else {
+ 109:quantum/process_keycode/process_combo.c ****             /* continue processing without immediately returning */
+ 110:quantum/process_keycode/process_combo.c ****             is_combo_active = false;
+ 111:quantum/process_keycode/process_combo.c ****         }
+ 112:quantum/process_keycode/process_combo.c **** 
+ 113:quantum/process_keycode/process_combo.c ****         KEY_STATE_UP(index);
+ 114:quantum/process_keycode/process_combo.c ****     }
+ 115:quantum/process_keycode/process_combo.c **** 
+ 116:quantum/process_keycode/process_combo.c ****     return is_combo_active;
+ 117:quantum/process_keycode/process_combo.c **** }
+ 118:quantum/process_keycode/process_combo.c **** 
+ 119:quantum/process_keycode/process_combo.c **** #define NO_COMBO_KEYS_ARE_DOWN (0 == combo->state)
+ 120:quantum/process_keycode/process_combo.c **** 
+ 121:quantum/process_keycode/process_combo.c **** bool process_combo(uint16_t keycode, keyrecord_t *record) {
+ 122:quantum/process_keycode/process_combo.c ****     bool is_combo_key          = false;
+ 123:quantum/process_keycode/process_combo.c ****     drop_buffer                = false;
+ 124:quantum/process_keycode/process_combo.c ****     bool no_combo_keys_pressed = true;
+ 125:quantum/process_keycode/process_combo.c **** 
+ 126:quantum/process_keycode/process_combo.c ****     if (keycode == CMB_ON && record->event.pressed) {
+ 127:quantum/process_keycode/process_combo.c ****         combo_enable();
+ 128:quantum/process_keycode/process_combo.c ****         return true;
+ 129:quantum/process_keycode/process_combo.c ****     }
+ 130:quantum/process_keycode/process_combo.c **** 
+ 131:quantum/process_keycode/process_combo.c ****     if (keycode == CMB_OFF && record->event.pressed) {
+ 132:quantum/process_keycode/process_combo.c ****         combo_disable();
+ 133:quantum/process_keycode/process_combo.c ****         return true;
+ 134:quantum/process_keycode/process_combo.c ****     }
+ 135:quantum/process_keycode/process_combo.c **** 
+ 136:quantum/process_keycode/process_combo.c ****     if (keycode == CMB_TOG && record->event.pressed) {
+ 137:quantum/process_keycode/process_combo.c ****         combo_toggle();
+ 138:quantum/process_keycode/process_combo.c ****         return true;
+ 139:quantum/process_keycode/process_combo.c ****     }
+ 140:quantum/process_keycode/process_combo.c **** 
+ 141:quantum/process_keycode/process_combo.c ****     if (!is_combo_enabled()) {
+ 142:quantum/process_keycode/process_combo.c ****         return true;
+ 143:quantum/process_keycode/process_combo.c ****     }
+ 144:quantum/process_keycode/process_combo.c **** 
+ 145:quantum/process_keycode/process_combo.c ****     for (current_combo_index = 0; current_combo_index < COMBO_COUNT; ++current_combo_index) {
+ 146:quantum/process_keycode/process_combo.c ****         combo_t *combo = &key_combos[current_combo_index];
+ 147:quantum/process_keycode/process_combo.c ****         is_combo_key |= process_single_combo(combo, keycode, record);
+ 148:quantum/process_keycode/process_combo.c ****         no_combo_keys_pressed = no_combo_keys_pressed && NO_COMBO_KEYS_ARE_DOWN;
+ 149:quantum/process_keycode/process_combo.c ****     }
+ 150:quantum/process_keycode/process_combo.c **** 
+ 151:quantum/process_keycode/process_combo.c ****     if (drop_buffer) {
+ 152:quantum/process_keycode/process_combo.c ****         /* buffer is only dropped when we complete a combo, so we refresh the timer
+ 153:quantum/process_keycode/process_combo.c ****          * here */
+ 154:quantum/process_keycode/process_combo.c ****         timer = timer_read();
+ 155:quantum/process_keycode/process_combo.c ****         dump_key_buffer(false);
+ 156:quantum/process_keycode/process_combo.c ****     } else if (!is_combo_key) {
+ 157:quantum/process_keycode/process_combo.c ****         /* if no combos claim the key we need to emit the keybuffer */
+ 158:quantum/process_keycode/process_combo.c ****         dump_key_buffer(true);
+ 159:quantum/process_keycode/process_combo.c **** 
+ 160:quantum/process_keycode/process_combo.c ****         // reset state if there are no combo keys pressed at all
+ 161:quantum/process_keycode/process_combo.c ****         if (no_combo_keys_pressed) {
+ 162:quantum/process_keycode/process_combo.c ****             timer     = 0;
+ 163:quantum/process_keycode/process_combo.c ****             is_active = true;
+ 164:quantum/process_keycode/process_combo.c ****         }
+ 165:quantum/process_keycode/process_combo.c ****     } else if (record->event.pressed && is_active) {
+ 166:quantum/process_keycode/process_combo.c ****         /* otherwise the key is consumed and placed in the buffer */
+ 167:quantum/process_keycode/process_combo.c ****         timer = timer_read();
+ 168:quantum/process_keycode/process_combo.c **** 
+ 169:quantum/process_keycode/process_combo.c ****         if (buffer_size < MAX_COMBO_LENGTH) {
+ 170:quantum/process_keycode/process_combo.c **** #ifdef COMBO_ALLOW_ACTION_KEYS
+ 171:quantum/process_keycode/process_combo.c ****             key_buffer[buffer_size++] = *record;
+ 172:quantum/process_keycode/process_combo.c **** #else
+ 173:quantum/process_keycode/process_combo.c ****             key_buffer[buffer_size++] = keycode;
+ 174:quantum/process_keycode/process_combo.c **** #endif
+ 175:quantum/process_keycode/process_combo.c ****         }
+ 176:quantum/process_keycode/process_combo.c ****     }
+ 177:quantum/process_keycode/process_combo.c **** 
+ 178:quantum/process_keycode/process_combo.c ****     return !is_combo_key;
+ 179:quantum/process_keycode/process_combo.c **** }
+ 180:quantum/process_keycode/process_combo.c **** 
+ 181:quantum/process_keycode/process_combo.c **** void matrix_scan_combo(void) {
+ 118               		.loc 1 181 30 is_stmt 1 view -0
+ 119               		.cfi_startproc
+ 120               	/* prologue: function */
+ 121               	/* frame size = 0 */
+ 122               	/* stack size = 0 */
+ 123               	.L__stack_usage = 0
+ 182:quantum/process_keycode/process_combo.c ****     if (b_combo_enable && is_active && timer && timer_elapsed(timer) > COMBO_TERM) {
+ 124               		.loc 1 182 5 view .LVU20
+ 125               		.loc 1 182 8 is_stmt 0 view .LVU21
+ 126 0000 8091 0000 		lds r24,b_combo_enable
+ 127 0004 8823      		tst r24
+ 128 0006 01F0      		breq .L11
+ 129               		.loc 1 182 24 discriminator 1 view .LVU22
+ 130 0008 8091 0000 		lds r24,is_active
+ 131 000c 8823      		tst r24
+ 132 000e 01F0      		breq .L11
+ 133               		.loc 1 182 37 discriminator 2 view .LVU23
+ 134 0010 8091 0000 		lds r24,timer
+ 135 0014 9091 0000 		lds r25,timer+1
+ 136 0018 0097      		sbiw r24,0
+ 137 001a 01F0      		breq .L11
+ 138               		.loc 1 182 49 discriminator 3 view .LVU24
+ 139 001c 0E94 0000 		call timer_elapsed
+ 140               	.LVL10:
+ 141               		.loc 1 182 46 discriminator 3 view .LVU25
+ 142 0020 C397      		sbiw r24,51
+ 143 0022 00F0      		brlo .L11
+ 183:quantum/process_keycode/process_combo.c ****         /* This disables the combo, meaning key events for this
+ 184:quantum/process_keycode/process_combo.c ****          * combo will be handled by the next processors in the chain
+ 185:quantum/process_keycode/process_combo.c ****          */
+ 186:quantum/process_keycode/process_combo.c ****         is_active = false;
+ 144               		.loc 1 186 9 is_stmt 1 view .LVU26
+ 145               		.loc 1 186 19 is_stmt 0 view .LVU27
+ 146 0024 1092 0000 		sts is_active,__zero_reg__
+ 187:quantum/process_keycode/process_combo.c ****         dump_key_buffer(true);
+ 147               		.loc 1 187 9 is_stmt 1 view .LVU28
+ 148 0028 81E0      		ldi r24,lo8(1)
+ 149 002a 0C94 0000 		jmp dump_key_buffer
+ 150               	.LVL11:
+ 151               	.L11:
+ 152               	/* epilogue start */
+ 188:quantum/process_keycode/process_combo.c ****     }
+ 189:quantum/process_keycode/process_combo.c **** }
+ 153               		.loc 1 189 1 is_stmt 0 view .LVU29
+ 154 002e 0895      		ret
+ 155               		.cfi_endproc
+ 156               	.LFE114:
+ 158               		.section	.text.combo_enable,"ax",@progbits
+ 159               	.global	combo_enable
+ 161               	combo_enable:
+ 162               	.LFB115:
+ 190:quantum/process_keycode/process_combo.c **** 
+ 191:quantum/process_keycode/process_combo.c **** void combo_enable(void) { b_combo_enable = true; }
+ 163               		.loc 1 191 25 is_stmt 1 view -0
+ 164               		.cfi_startproc
+ 165               	/* prologue: function */
+ 166               	/* frame size = 0 */
+ 167               	/* stack size = 0 */
+ 168               	.L__stack_usage = 0
+ 169               		.loc 1 191 27 view .LVU31
+ 170               		.loc 1 191 42 is_stmt 0 view .LVU32
+ 171 0000 81E0      		ldi r24,lo8(1)
+ 172 0002 8093 0000 		sts b_combo_enable,r24
+ 173               	/* epilogue start */
+ 174               		.loc 1 191 1 view .LVU33
+ 175 0006 0895      		ret
+ 176               		.cfi_endproc
+ 177               	.LFE115:
+ 179               		.section	.text.combo_disable,"ax",@progbits
+ 180               	.global	combo_disable
+ 182               	combo_disable:
+ 183               	.LFB116:
+ 192:quantum/process_keycode/process_combo.c **** 
+ 193:quantum/process_keycode/process_combo.c **** void combo_disable(void) {
+ 184               		.loc 1 193 26 is_stmt 1 view -0
+ 185               		.cfi_startproc
+ 186               	/* prologue: function */
+ 187               	/* frame size = 0 */
+ 188               	/* stack size = 0 */
+ 189               	.L__stack_usage = 0
+ 194:quantum/process_keycode/process_combo.c ****     b_combo_enable = is_active = false;
+ 190               		.loc 1 194 5 view .LVU35
+ 191               		.loc 1 194 32 is_stmt 0 view .LVU36
+ 192 0000 1092 0000 		sts is_active,__zero_reg__
+ 193               		.loc 1 194 20 view .LVU37
+ 194 0004 1092 0000 		sts b_combo_enable,__zero_reg__
+ 195:quantum/process_keycode/process_combo.c ****     timer                      = 0;
+ 195               		.loc 1 195 5 is_stmt 1 view .LVU38
+ 196               		.loc 1 195 32 is_stmt 0 view .LVU39
+ 197 0008 1092 0000 		sts timer+1,__zero_reg__
+ 198 000c 1092 0000 		sts timer,__zero_reg__
+ 196:quantum/process_keycode/process_combo.c ****     dump_key_buffer(true);
+ 199               		.loc 1 196 5 is_stmt 1 view .LVU40
+ 200 0010 81E0      		ldi r24,lo8(1)
+ 201 0012 0C94 0000 		jmp dump_key_buffer
+ 202               	.LVL12:
+ 203               		.cfi_endproc
+ 204               	.LFE116:
+ 206               		.section	.text.combo_toggle,"ax",@progbits
+ 207               	.global	combo_toggle
+ 209               	combo_toggle:
+ 210               	.LFB117:
+ 197:quantum/process_keycode/process_combo.c **** }
+ 198:quantum/process_keycode/process_combo.c **** 
+ 199:quantum/process_keycode/process_combo.c **** void combo_toggle(void) {
+ 211               		.loc 1 199 25 view -0
+ 212               		.cfi_startproc
+ 213               	/* prologue: function */
+ 214               	/* frame size = 0 */
+ 215               	/* stack size = 0 */
+ 216               	.L__stack_usage = 0
+ 200:quantum/process_keycode/process_combo.c ****     if (b_combo_enable) {
+ 217               		.loc 1 200 5 view .LVU42
+ 218               		.loc 1 200 8 is_stmt 0 view .LVU43
+ 219 0000 8091 0000 		lds r24,b_combo_enable
+ 220 0004 8111      		cpse r24,__zero_reg__
+ 201:quantum/process_keycode/process_combo.c ****         combo_disable();
+ 221               		.loc 1 201 9 is_stmt 1 view .LVU44
+ 222 0006 0C94 0000 		jmp combo_disable
+ 223               	.LVL13:
+ 224               	.L24:
+ 202:quantum/process_keycode/process_combo.c ****     } else {
+ 203:quantum/process_keycode/process_combo.c ****         combo_enable();
+ 225               		.loc 1 203 9 view .LVU45
+ 226               	.LBB16:
+ 227               	.LBI16:
+ 191:quantum/process_keycode/process_combo.c **** 
+ 228               		.loc 1 191 6 view .LVU46
+ 229               	.LBB17:
+ 191:quantum/process_keycode/process_combo.c **** 
+ 230               		.loc 1 191 27 view .LVU47
+ 191:quantum/process_keycode/process_combo.c **** 
+ 231               		.loc 1 191 42 is_stmt 0 view .LVU48
+ 232 000a 81E0      		ldi r24,lo8(1)
+ 233 000c 8093 0000 		sts b_combo_enable,r24
+ 234               	/* epilogue start */
+ 235               	.LBE17:
+ 236               	.LBE16:
+ 204:quantum/process_keycode/process_combo.c ****     }
+ 205:quantum/process_keycode/process_combo.c **** }
+ 237               		.loc 1 205 1 view .LVU49
+ 238 0010 0895      		ret
+ 239               		.cfi_endproc
+ 240               	.LFE117:
+ 242               		.section	.text.process_combo,"ax",@progbits
+ 243               	.global	process_combo
+ 245               	process_combo:
+ 246               	.LVL14:
+ 247               	.LFB113:
+ 121:quantum/process_keycode/process_combo.c ****     bool is_combo_key          = false;
+ 248               		.loc 1 121 59 is_stmt 1 view -0
+ 249               		.cfi_startproc
+ 121:quantum/process_keycode/process_combo.c ****     bool is_combo_key          = false;
+ 250               		.loc 1 121 59 is_stmt 0 view .LVU51
+ 251 0000 6F92      		push r6
+ 252               	.LCFI1:
+ 253               		.cfi_def_cfa_offset 3
+ 254               		.cfi_offset 6, -2
+ 255 0002 7F92      		push r7
+ 256               	.LCFI2:
+ 257               		.cfi_def_cfa_offset 4
+ 258               		.cfi_offset 7, -3
+ 259 0004 8F92      		push r8
+ 260               	.LCFI3:
+ 261               		.cfi_def_cfa_offset 5
+ 262               		.cfi_offset 8, -4
+ 263 0006 9F92      		push r9
+ 264               	.LCFI4:
+ 265               		.cfi_def_cfa_offset 6
+ 266               		.cfi_offset 9, -5
+ 267 0008 AF92      		push r10
+ 268               	.LCFI5:
+ 269               		.cfi_def_cfa_offset 7
+ 270               		.cfi_offset 10, -6
+ 271 000a BF92      		push r11
+ 272               	.LCFI6:
+ 273               		.cfi_def_cfa_offset 8
+ 274               		.cfi_offset 11, -7
+ 275 000c CF92      		push r12
+ 276               	.LCFI7:
+ 277               		.cfi_def_cfa_offset 9
+ 278               		.cfi_offset 12, -8
+ 279 000e DF92      		push r13
+ 280               	.LCFI8:
+ 281               		.cfi_def_cfa_offset 10
+ 282               		.cfi_offset 13, -9
+ 283 0010 EF92      		push r14
+ 284               	.LCFI9:
+ 285               		.cfi_def_cfa_offset 11
+ 286               		.cfi_offset 14, -10
+ 287 0012 FF92      		push r15
+ 288               	.LCFI10:
+ 289               		.cfi_def_cfa_offset 12
+ 290               		.cfi_offset 15, -11
+ 291 0014 0F93      		push r16
+ 292               	.LCFI11:
+ 293               		.cfi_def_cfa_offset 13
+ 294               		.cfi_offset 16, -12
+ 295 0016 1F93      		push r17
+ 296               	.LCFI12:
+ 297               		.cfi_def_cfa_offset 14
+ 298               		.cfi_offset 17, -13
+ 299 0018 CF93      		push r28
+ 300               	.LCFI13:
+ 301               		.cfi_def_cfa_offset 15
+ 302               		.cfi_offset 28, -14
+ 303 001a DF93      		push r29
+ 304               	.LCFI14:
+ 305               		.cfi_def_cfa_offset 16
+ 306               		.cfi_offset 29, -15
+ 307               	/* prologue: function */
+ 308               	/* frame size = 0 */
+ 309               	/* stack size = 14 */
+ 310               	.L__stack_usage = 14
+ 311 001c 8C01      		movw r16,r24
+ 312 001e 7B01      		movw r14,r22
+ 122:quantum/process_keycode/process_combo.c ****     drop_buffer                = false;
+ 313               		.loc 1 122 5 is_stmt 1 view .LVU52
+ 314               	.LVL15:
+ 123:quantum/process_keycode/process_combo.c ****     bool no_combo_keys_pressed = true;
+ 315               		.loc 1 123 5 view .LVU53
+ 123:quantum/process_keycode/process_combo.c ****     bool no_combo_keys_pressed = true;
+ 316               		.loc 1 123 32 is_stmt 0 view .LVU54
+ 317 0020 1092 0000 		sts drop_buffer,__zero_reg__
+ 124:quantum/process_keycode/process_combo.c **** 
+ 318               		.loc 1 124 5 is_stmt 1 view .LVU55
+ 319               	.LVL16:
+ 126:quantum/process_keycode/process_combo.c ****         combo_enable();
+ 320               		.loc 1 126 5 view .LVU56
+ 126:quantum/process_keycode/process_combo.c ****         combo_enable();
+ 321               		.loc 1 126 8 is_stmt 0 view .LVU57
+ 322 0024 073F      		cpi r16,-9
+ 323 0026 8CE5      		ldi r24,92
+ 324 0028 1807      		cpc r17,r24
+ 325               	.LVL17:
+ 126:quantum/process_keycode/process_combo.c ****         combo_enable();
+ 326               		.loc 1 126 8 view .LVU58
+ 327 002a 01F4      		brne .L26
+ 126:quantum/process_keycode/process_combo.c ****         combo_enable();
+ 328               		.loc 1 126 43 discriminator 1 view .LVU59
+ 329 002c FB01      		movw r30,r22
+ 330 002e C281      		ldd r28,Z+2
+ 126:quantum/process_keycode/process_combo.c ****         combo_enable();
+ 331               		.loc 1 126 27 discriminator 1 view .LVU60
+ 332 0030 CC23      		tst r28
+ 333 0032 01F0      		breq .L27
+ 127:quantum/process_keycode/process_combo.c ****         return true;
+ 334               		.loc 1 127 9 is_stmt 1 view .LVU61
+ 335               	.LBB36:
+ 336               	.LBI36:
+ 191:quantum/process_keycode/process_combo.c **** 
+ 337               		.loc 1 191 6 view .LVU62
+ 338               	.LBB37:
+ 191:quantum/process_keycode/process_combo.c **** 
+ 339               		.loc 1 191 27 view .LVU63
+ 191:quantum/process_keycode/process_combo.c **** 
+ 340               		.loc 1 191 42 is_stmt 0 view .LVU64
+ 341 0034 81E0      		ldi r24,lo8(1)
+ 342 0036 8093 0000 		sts b_combo_enable,r24
+ 343               	.LVL18:
+ 344               	.L25:
+ 191:quantum/process_keycode/process_combo.c **** 
+ 345               		.loc 1 191 42 view .LVU65
+ 346               	.LBE37:
+ 347               	.LBE36:
+ 179:quantum/process_keycode/process_combo.c **** 
+ 348               		.loc 1 179 1 view .LVU66
+ 349 003a 8C2F      		mov r24,r28
+ 350               	/* epilogue start */
+ 351 003c DF91      		pop r29
+ 352 003e CF91      		pop r28
+ 353 0040 1F91      		pop r17
+ 354 0042 0F91      		pop r16
+ 355               	.LVL19:
+ 179:quantum/process_keycode/process_combo.c **** 
+ 356               		.loc 1 179 1 view .LVU67
+ 357 0044 FF90      		pop r15
+ 358 0046 EF90      		pop r14
+ 359               	.LVL20:
+ 179:quantum/process_keycode/process_combo.c **** 
+ 360               		.loc 1 179 1 view .LVU68
+ 361 0048 DF90      		pop r13
+ 362 004a CF90      		pop r12
+ 363 004c BF90      		pop r11
+ 364 004e AF90      		pop r10
+ 365 0050 9F90      		pop r9
+ 366 0052 8F90      		pop r8
+ 367 0054 7F90      		pop r7
+ 368 0056 6F90      		pop r6
+ 369 0058 0895      		ret
+ 370               	.LVL21:
+ 371               	.L26:
+ 131:quantum/process_keycode/process_combo.c ****         combo_disable();
+ 372               		.loc 1 131 5 is_stmt 1 view .LVU69
+ 131:quantum/process_keycode/process_combo.c ****         combo_disable();
+ 373               		.loc 1 131 8 is_stmt 0 view .LVU70
+ 374 005a 083F      		cpi r16,-8
+ 375 005c FCE5      		ldi r31,92
+ 376 005e 1F07      		cpc r17,r31
+ 377 0060 01F4      		brne .L29
+ 131:quantum/process_keycode/process_combo.c ****         combo_disable();
+ 378               		.loc 1 131 44 discriminator 1 view .LVU71
+ 379 0062 FB01      		movw r30,r22
+ 380 0064 C281      		ldd r28,Z+2
+ 131:quantum/process_keycode/process_combo.c ****         combo_disable();
+ 381               		.loc 1 131 28 discriminator 1 view .LVU72
+ 382 0066 CC23      		tst r28
+ 383 0068 01F0      		breq .L27
+ 132:quantum/process_keycode/process_combo.c ****         return true;
+ 384               		.loc 1 132 9 is_stmt 1 view .LVU73
+ 385 006a 0E94 0000 		call combo_disable
+ 386               	.LVL22:
+ 133:quantum/process_keycode/process_combo.c ****     }
+ 387               		.loc 1 133 9 view .LVU74
+ 133:quantum/process_keycode/process_combo.c ****     }
+ 388               		.loc 1 133 16 is_stmt 0 view .LVU75
+ 389 006e 00C0      		rjmp .L25
+ 390               	.L29:
+ 136:quantum/process_keycode/process_combo.c ****         combo_toggle();
+ 391               		.loc 1 136 5 is_stmt 1 view .LVU76
+ 136:quantum/process_keycode/process_combo.c ****         combo_toggle();
+ 392               		.loc 1 136 8 is_stmt 0 view .LVU77
+ 393 0070 093F      		cpi r16,-7
+ 394 0072 FCE5      		ldi r31,92
+ 395 0074 1F07      		cpc r17,r31
+ 396 0076 01F4      		brne .L27
+ 136:quantum/process_keycode/process_combo.c ****         combo_toggle();
+ 397               		.loc 1 136 44 discriminator 1 view .LVU78
+ 398 0078 FB01      		movw r30,r22
+ 399 007a C281      		ldd r28,Z+2
+ 136:quantum/process_keycode/process_combo.c ****         combo_toggle();
+ 400               		.loc 1 136 28 discriminator 1 view .LVU79
+ 401 007c CC23      		tst r28
+ 402 007e 01F0      		breq .L27
+ 137:quantum/process_keycode/process_combo.c ****         return true;
+ 403               		.loc 1 137 9 is_stmt 1 view .LVU80
+ 404 0080 0E94 0000 		call combo_toggle
+ 405               	.LVL23:
+ 138:quantum/process_keycode/process_combo.c ****     }
+ 406               		.loc 1 138 9 view .LVU81
+ 138:quantum/process_keycode/process_combo.c ****     }
+ 407               		.loc 1 138 16 is_stmt 0 view .LVU82
+ 408 0084 00C0      		rjmp .L25
+ 409               	.L27:
+ 141:quantum/process_keycode/process_combo.c ****         return true;
+ 410               		.loc 1 141 5 is_stmt 1 view .LVU83
+ 411               	.LBB38:
+ 412               	.LBI38:
+ 206:quantum/process_keycode/process_combo.c **** 
+ 207:quantum/process_keycode/process_combo.c **** bool is_combo_enabled(void) { return b_combo_enable; }
+ 413               		.loc 1 207 6 view .LVU84
+ 414               	.LBB39:
+ 415               		.loc 1 207 31 view .LVU85
+ 416               		.loc 1 207 38 is_stmt 0 view .LVU86
+ 417 0086 D091 0000 		lds r29,b_combo_enable
+ 418               	.LBE39:
+ 419               	.LBE38:
+ 142:quantum/process_keycode/process_combo.c ****     }
+ 420               		.loc 1 142 16 view .LVU87
+ 421 008a C1E0      		ldi r28,lo8(1)
+ 141:quantum/process_keycode/process_combo.c ****         return true;
+ 422               		.loc 1 141 8 view .LVU88
+ 423 008c DD23      		tst r29
+ 424 008e 01F0      		breq .L25
+ 145:quantum/process_keycode/process_combo.c ****         combo_t *combo = &key_combos[current_combo_index];
+ 425               		.loc 1 145 5 is_stmt 1 view .LVU89
+ 145:quantum/process_keycode/process_combo.c ****         combo_t *combo = &key_combos[current_combo_index];
+ 426               		.loc 1 145 30 is_stmt 0 view .LVU90
+ 427 0090 1092 0000 		sts current_combo_index,__zero_reg__
+ 122:quantum/process_keycode/process_combo.c ****     drop_buffer                = false;
+ 428               		.loc 1 122 10 view .LVU91
+ 429 0094 C0E0      		ldi r28,0
+ 430 0096 8824      		clr r8
+ 431 0098 8394      		inc r8
+ 432 009a 912C      		mov r9,__zero_reg__
+ 433               	.LBB40:
+ 434               	.LBB41:
+ 435               	.LBB42:
+ 102:quantum/process_keycode/process_combo.c ****             }
+ 436               		.loc 1 102 29 view .LVU92
+ 437 009c 7724      		clr r7
+ 438 009e 7394      		inc r7
+ 439               	.LVL24:
+ 440               	.L30:
+ 102:quantum/process_keycode/process_combo.c ****             }
+ 441               		.loc 1 102 29 view .LVU93
+ 442               	.LBE42:
+ 443               	.LBE41:
+ 444               	.LBE40:
+ 145:quantum/process_keycode/process_combo.c ****         combo_t *combo = &key_combos[current_combo_index];
+ 445               		.loc 1 145 55 discriminator 2 view .LVU94
+ 446 00a0 3091 0000 		lds r19,current_combo_index
+ 145:quantum/process_keycode/process_combo.c ****         combo_t *combo = &key_combos[current_combo_index];
+ 447               		.loc 1 145 5 discriminator 2 view .LVU95
+ 448 00a4 3230      		cpi r19,lo8(2)
+ 449 00a6 00F0      		brlo .L44
+ 151:quantum/process_keycode/process_combo.c ****         /* buffer is only dropped when we complete a combo, so we refresh the timer
+ 450               		.loc 1 151 5 is_stmt 1 view .LVU96
+ 151:quantum/process_keycode/process_combo.c ****         /* buffer is only dropped when we complete a combo, so we refresh the timer
+ 451               		.loc 1 151 8 is_stmt 0 view .LVU97
+ 452 00a8 8091 0000 		lds r24,drop_buffer
+ 453 00ac 8823      		tst r24
+ 454 00ae 01F4      		brne .+2
+ 455 00b0 00C0      		rjmp .L45
+ 154:quantum/process_keycode/process_combo.c ****         dump_key_buffer(false);
+ 456               		.loc 1 154 9 is_stmt 1 view .LVU98
+ 154:quantum/process_keycode/process_combo.c ****         dump_key_buffer(false);
+ 457               		.loc 1 154 17 is_stmt 0 view .LVU99
+ 458 00b2 0E94 0000 		call timer_read
+ 459               	.LVL25:
+ 154:quantum/process_keycode/process_combo.c ****         dump_key_buffer(false);
+ 460               		.loc 1 154 15 view .LVU100
+ 461 00b6 9093 0000 		sts timer+1,r25
+ 462 00ba 8093 0000 		sts timer,r24
+ 155:quantum/process_keycode/process_combo.c ****     } else if (!is_combo_key) {
+ 463               		.loc 1 155 9 is_stmt 1 view .LVU101
+ 464 00be 80E0      		ldi r24,0
+ 465 00c0 0E94 0000 		call dump_key_buffer
+ 466               	.LVL26:
+ 467               	.L46:
+ 178:quantum/process_keycode/process_combo.c **** }
+ 468               		.loc 1 178 5 view .LVU102
+ 469 00c4 81E0      		ldi r24,lo8(1)
+ 470 00c6 C827      		eor r28,r24
+ 471               	.LVL27:
+ 178:quantum/process_keycode/process_combo.c **** }
+ 472               		.loc 1 178 12 is_stmt 0 view .LVU103
+ 473 00c8 00C0      		rjmp .L25
+ 474               	.LVL28:
+ 475               	.L44:
+ 476               	.LBB63:
+ 146:quantum/process_keycode/process_combo.c ****         is_combo_key |= process_single_combo(combo, keycode, record);
+ 477               		.loc 1 146 9 is_stmt 1 view .LVU104
+ 146:quantum/process_keycode/process_combo.c ****         is_combo_key |= process_single_combo(combo, keycode, record);
+ 478               		.loc 1 146 37 is_stmt 0 view .LVU105
+ 479 00ca C32E      		mov r12,r19
+ 480 00cc D12C      		mov r13,__zero_reg__
+ 481               	.LVL29:
+ 147:quantum/process_keycode/process_combo.c ****         no_combo_keys_pressed = no_combo_keys_pressed && NO_COMBO_KEYS_ARE_DOWN;
+ 482               		.loc 1 147 9 is_stmt 1 view .LVU106
+ 483               	.LBB61:
+ 484               	.LBI41:
+  81:quantum/process_keycode/process_combo.c ****     uint8_t count = 0;
+ 485               		.loc 1 81 13 view .LVU107
+ 486               	.LBB59:
+  82:quantum/process_keycode/process_combo.c ****     uint8_t index = -1;
+ 487               		.loc 1 82 5 view .LVU108
+  83:quantum/process_keycode/process_combo.c ****     /* Find index of keycode and number of combo keys */
+ 488               		.loc 1 83 5 view .LVU109
+  85:quantum/process_keycode/process_combo.c ****         uint16_t key = pgm_read_word(&keys[count]);
+ 489               		.loc 1 85 5 view .LVU110
+ 490               	.LBB43:
+  85:quantum/process_keycode/process_combo.c ****         uint16_t key = pgm_read_word(&keys[count]);
+ 491               		.loc 1 85 10 view .LVU111
+  85:quantum/process_keycode/process_combo.c ****         uint16_t key = pgm_read_word(&keys[count]);
+ 492               		.loc 1 85 26 is_stmt 0 view .LVU112
+ 493 00ce C601      		movw r24,r12
+ 494 00d0 65E0      		ldi r22,lo8(5)
+ 495 00d2 70E0      		ldi r23,0
+ 496 00d4 0E94 0000 		call __mulhi3
+ 497 00d8 8050      		subi r24,lo8(-(key_combos))
+ 498 00da 9040      		sbci r25,hi8(-(key_combos))
+ 499               	.LVL30:
+  85:quantum/process_keycode/process_combo.c ****         uint16_t key = pgm_read_word(&keys[count]);
+ 500               		.loc 1 85 26 view .LVU113
+ 501 00dc FC01      		movw r30,r24
+ 502 00de 8081      		ld r24,Z
+ 503 00e0 9181      		ldd r25,Z+1
+ 504               	.LVL31:
+  85:quantum/process_keycode/process_combo.c ****         uint16_t key = pgm_read_word(&keys[count]);
+ 505               		.loc 1 85 26 view .LVU114
+ 506               	.LBE43:
+  83:quantum/process_keycode/process_combo.c ****     /* Find index of keycode and number of combo keys */
+ 507               		.loc 1 83 13 view .LVU115
+ 508 00e2 AFEF      		ldi r26,lo8(-1)
+  82:quantum/process_keycode/process_combo.c ****     uint8_t index = -1;
+ 509               		.loc 1 82 13 view .LVU116
+ 510 00e4 20E0      		ldi r18,0
+ 511               	.LVL32:
+ 512               	.L33:
+ 513               	.LBB46:
+ 514               	.LBB44:
+  86:quantum/process_keycode/process_combo.c ****         if (keycode == key) index = count;
+ 515               		.loc 1 86 9 is_stmt 1 view .LVU117
+ 516               	.LBB45:
+  86:quantum/process_keycode/process_combo.c ****         if (keycode == key) index = count;
+ 517               		.loc 1 86 24 view .LVU118
+ 518 00e6 E22F      		mov r30,r18
+ 519 00e8 F0E0      		ldi r31,0
+ 520 00ea EE0F      		lsl r30
+ 521 00ec FF1F      		rol r31
+ 522 00ee E80F      		add r30,r24
+ 523 00f0 F91F      		adc r31,r25
+ 524               	.LVL33:
+  86:quantum/process_keycode/process_combo.c ****         if (keycode == key) index = count;
+ 525               		.loc 1 86 24 view .LVU119
+  86:quantum/process_keycode/process_combo.c ****         if (keycode == key) index = count;
+ 526               		.loc 1 86 24 view .LVU120
+ 527               	/* #APP */
+ 528               	 ;  86 "quantum/process_keycode/process_combo.c" 1
+ 529 00f2 4591      		lpm r20, Z+
+ 530 00f4 5491      		lpm r21, Z
+ 531               		
+ 532               	 ;  0 "" 2
+ 533               	.LVL34:
+  86:quantum/process_keycode/process_combo.c ****         if (keycode == key) index = count;
+ 534               		.loc 1 86 24 view .LVU121
+  86:quantum/process_keycode/process_combo.c ****         if (keycode == key) index = count;
+ 535               		.loc 1 86 24 is_stmt 0 view .LVU122
+ 536               	/* #NOAPP */
+ 537               	.LBE45:
+  87:quantum/process_keycode/process_combo.c ****         if (COMBO_END == key) break;
+ 538               		.loc 1 87 9 is_stmt 1 view .LVU123
+  87:quantum/process_keycode/process_combo.c ****         if (COMBO_END == key) break;
+ 539               		.loc 1 87 12 is_stmt 0 view .LVU124
+ 540 00f6 0417      		cp r16,r20
+ 541 00f8 1507      		cpc r17,r21
+ 542 00fa 01F4      		brne .L31
+ 543 00fc A22F      		mov r26,r18
+ 544               	.LVL35:
+ 545               	.L31:
+  88:quantum/process_keycode/process_combo.c ****     }
+ 546               		.loc 1 88 9 is_stmt 1 view .LVU125
+  88:quantum/process_keycode/process_combo.c ****     }
+ 547               		.loc 1 88 12 is_stmt 0 view .LVU126
+ 548 00fe 452B      		or r20,r21
+ 549 0100 01F0      		breq .L32
+ 550               	.LBE44:
+  85:quantum/process_keycode/process_combo.c ****         uint16_t key = pgm_read_word(&keys[count]);
+ 551               		.loc 1 85 47 view .LVU127
+ 552 0102 2F5F      		subi r18,lo8(-(1))
+ 553               	.LVL36:
+  85:quantum/process_keycode/process_combo.c ****         uint16_t key = pgm_read_word(&keys[count]);
+ 554               		.loc 1 85 47 view .LVU128
+ 555 0104 00C0      		rjmp .L33
+ 556               	.L32:
+  85:quantum/process_keycode/process_combo.c ****         uint16_t key = pgm_read_word(&keys[count]);
+ 557               		.loc 1 85 47 view .LVU129
+ 558               	.LBE46:
+  92:quantum/process_keycode/process_combo.c **** 
+ 559               		.loc 1 92 5 is_stmt 1 view .LVU130
+  92:quantum/process_keycode/process_combo.c **** 
+ 560               		.loc 1 92 8 is_stmt 0 view .LVU131
+ 561 0106 AF3F      		cpi r26,lo8(-1)
+ 562 0108 01F4      		brne .L34
+ 563               	.LVL37:
+ 564               	.L37:
+  92:quantum/process_keycode/process_combo.c **** 
+ 565               		.loc 1 92 37 view .LVU132
+ 566 010a 612C      		mov r6,__zero_reg__
+ 567               	.LVL38:
+ 568               	.L35:
+  92:quantum/process_keycode/process_combo.c **** 
+ 569               		.loc 1 92 37 view .LVU133
+ 570               	.LBE59:
+ 571               	.LBE61:
+ 147:quantum/process_keycode/process_combo.c ****         no_combo_keys_pressed = no_combo_keys_pressed && NO_COMBO_KEYS_ARE_DOWN;
+ 572               		.loc 1 147 22 view .LVU134
+ 573 010c C629      		or r28,r6
+ 574               	.LVL39:
+ 148:quantum/process_keycode/process_combo.c ****     }
+ 575               		.loc 1 148 9 is_stmt 1 view .LVU135
+ 148:quantum/process_keycode/process_combo.c ****     }
+ 576               		.loc 1 148 55 is_stmt 0 view .LVU136
+ 577 010e DD23      		tst r29
+ 578 0110 01F0      		breq .L52
+ 148:quantum/process_keycode/process_combo.c ****     }
+ 579               		.loc 1 148 58 discriminator 1 view .LVU137
+ 580 0112 C601      		movw r24,r12
+ 581 0114 65E0      		ldi r22,lo8(5)
+ 582 0116 70E0      		ldi r23,0
+ 583 0118 0E94 0000 		call __mulhi3
+ 584 011c 8050      		subi r24,lo8(-(key_combos))
+ 585 011e 9040      		sbci r25,hi8(-(key_combos))
+ 148:quantum/process_keycode/process_combo.c ****     }
+ 586               		.loc 1 148 55 discriminator 1 view .LVU138
+ 587 0120 D1E0      		ldi r29,lo8(1)
+ 588               	.LVL40:
+ 148:quantum/process_keycode/process_combo.c ****     }
+ 589               		.loc 1 148 55 discriminator 1 view .LVU139
+ 590 0122 FC01      		movw r30,r24
+ 591 0124 8481      		ldd r24,Z+4
+ 592 0126 8111      		cpse r24,__zero_reg__
+ 593               	.L52:
+ 148:quantum/process_keycode/process_combo.c ****     }
+ 594               		.loc 1 148 55 view .LVU140
+ 595 0128 D0E0      		ldi r29,0
+ 596               	.L42:
+ 148:quantum/process_keycode/process_combo.c ****     }
+ 597               		.loc 1 148 31 discriminator 6 view .LVU141
+ 598 012a D170      		andi r29,lo8(1)
+ 599               	.LVL41:
+ 148:quantum/process_keycode/process_combo.c ****     }
+ 600               		.loc 1 148 31 discriminator 6 view .LVU142
+ 601               	.LBE63:
+ 145:quantum/process_keycode/process_combo.c ****         combo_t *combo = &key_combos[current_combo_index];
+ 602               		.loc 1 145 70 discriminator 6 view .LVU143
+ 603 012c 8091 0000 		lds r24,current_combo_index
+ 604 0130 8F5F      		subi r24,lo8(-(1))
+ 605 0132 8093 0000 		sts current_combo_index,r24
+ 606 0136 00C0      		rjmp .L30
+ 607               	.LVL42:
+ 608               	.L34:
+ 609               	.LBB64:
+ 610               	.LBB62:
+ 611               	.LBB60:
+  94:quantum/process_keycode/process_combo.c **** 
+ 612               		.loc 1 94 5 is_stmt 1 view .LVU144
+  94:quantum/process_keycode/process_combo.c **** 
+ 613               		.loc 1 94 10 is_stmt 0 view .LVU145
+ 614 0138 6090 0000 		lds r6,is_active
+ 615               	.LVL43:
+  96:quantum/process_keycode/process_combo.c ****         KEY_STATE_DOWN(index);
+ 616               		.loc 1 96 5 is_stmt 1 view .LVU146
+  96:quantum/process_keycode/process_combo.c ****         KEY_STATE_DOWN(index);
+ 617               		.loc 1 96 22 is_stmt 0 view .LVU147
+ 618 013c F701      		movw r30,r14
+ 619 013e 4281      		ldd r20,Z+2
+ 620               	.LVL44:
+  96:quantum/process_keycode/process_combo.c ****         KEY_STATE_DOWN(index);
+ 621               		.loc 1 96 22 view .LVU148
+ 622 0140 C601      		movw r24,r12
+ 623               	.LVL45:
+  96:quantum/process_keycode/process_combo.c ****         KEY_STATE_DOWN(index);
+ 624               		.loc 1 96 22 view .LVU149
+ 625 0142 65E0      		ldi r22,lo8(5)
+ 626 0144 70E0      		ldi r23,0
+ 627 0146 0E94 0000 		call __mulhi3
+ 628 014a FC01      		movw r30,r24
+ 629 014c E050      		subi r30,lo8(-(key_combos))
+ 630 014e F040      		sbci r31,hi8(-(key_combos))
+ 631 0150 9481      		ldd r25,Z+4
+ 632 0152 5401      		movw r10,r8
+ 633 0154 00C0      		rjmp 2f
+ 634               		1:
+ 635 0156 AA0C      		lsl r10
+ 636               		2:
+ 637 0158 AA95      		dec r26
+ 638 015a 02F4      		brpl 1b
+  96:quantum/process_keycode/process_combo.c ****         KEY_STATE_DOWN(index);
+ 639               		.loc 1 96 8 view .LVU150
+ 640 015c 4423      		tst r20
+ 641 015e 01F0      		breq .L36
+  97:quantum/process_keycode/process_combo.c **** 
+ 642               		.loc 1 97 9 is_stmt 1 view .LVU151
+  97:quantum/process_keycode/process_combo.c **** 
+ 643               		.loc 1 97 9 view .LVU152
+ 644 0160 A92A      		or r10,r25
+ 645 0162 A482      		std Z+4,r10
+  99:quantum/process_keycode/process_combo.c ****             if (ALL_COMBO_KEYS_ARE_DOWN) { /* Combo was pressed */
+ 646               		.loc 1 99 9 view .LVU153
+  99:quantum/process_keycode/process_combo.c ****             if (ALL_COMBO_KEYS_ARE_DOWN) { /* Combo was pressed */
+ 647               		.loc 1 99 12 is_stmt 0 view .LVU154
+ 648 0164 6620      		tst r6
+ 649 0166 01F0      		breq .L37
+ 100:quantum/process_keycode/process_combo.c ****                 send_combo(combo->keycode, true);
+ 650               		.loc 1 100 13 is_stmt 1 view .LVU155
+ 100:quantum/process_keycode/process_combo.c ****                 send_combo(combo->keycode, true);
+ 651               		.loc 1 100 17 is_stmt 0 view .LVU156
+ 652 0168 C401      		movw r24,r8
+ 653 016a 00C0      		rjmp 2f
+ 654               		1:
+ 655 016c 880F      		lsl r24
+ 656 016e 991F      		rol r25
+ 657               		2:
+ 658 0170 2A95      		dec r18
+ 659 0172 02F4      		brpl 1b
+ 660 0174 0197      		sbiw r24,1
+ 100:quantum/process_keycode/process_combo.c ****                 send_combo(combo->keycode, true);
+ 661               		.loc 1 100 16 view .LVU157
+ 662 0176 A816      		cp r10,r24
+ 663 0178 1906      		cpc __zero_reg__,r25
+ 664 017a 01F4      		brne .L35
+ 101:quantum/process_keycode/process_combo.c ****                 drop_buffer = true;
+ 665               		.loc 1 101 17 is_stmt 1 view .LVU158
+ 666 017c 8281      		ldd r24,Z+2
+ 667 017e 9381      		ldd r25,Z+3
+ 668               	.LVL46:
+ 669               	.LBB47:
+ 670               	.LBI47:
+  39:quantum/process_keycode/process_combo.c ****     if (action) {
+ 671               		.loc 1 39 20 view .LVU159
+ 672               	.LBB48:
+  40:quantum/process_keycode/process_combo.c ****         if (pressed) {
+ 673               		.loc 1 40 5 view .LVU160
+  40:quantum/process_keycode/process_combo.c ****         if (pressed) {
+ 674               		.loc 1 40 8 is_stmt 0 view .LVU161
+ 675 0180 0097      		sbiw r24,0
+ 676 0182 01F0      		breq .L38
+  41:quantum/process_keycode/process_combo.c ****             register_code16(action);
+ 677               		.loc 1 41 9 is_stmt 1 view .LVU162
+  42:quantum/process_keycode/process_combo.c ****         } else {
+ 678               		.loc 1 42 13 view .LVU163
+ 679 0184 0E94 0000 		call register_code16
+ 680               	.LVL47:
+ 681               	.L39:
+  42:quantum/process_keycode/process_combo.c ****         } else {
+ 682               		.loc 1 42 13 is_stmt 0 view .LVU164
+ 683               	.LBE48:
+ 684               	.LBE47:
+ 102:quantum/process_keycode/process_combo.c ****             }
+ 685               		.loc 1 102 17 is_stmt 1 view .LVU165
+ 102:quantum/process_keycode/process_combo.c ****             }
+ 686               		.loc 1 102 29 is_stmt 0 view .LVU166
+ 687 0188 7092 0000 		sts drop_buffer,r7
+ 688 018c 00C0      		rjmp .L35
+ 689               	.LVL48:
+ 690               	.L38:
+ 691               	.LBB52:
+ 692               	.LBB51:
+ 693               	.LBB49:
+ 694               	.LBI49:
+  39:quantum/process_keycode/process_combo.c ****     if (action) {
+ 695               		.loc 1 39 20 is_stmt 1 view .LVU167
+ 696               	.LBB50:
+  47:quantum/process_keycode/process_combo.c ****     }
+ 697               		.loc 1 47 9 view .LVU168
+ 698 018e 61E0      		ldi r22,lo8(1)
+ 699 0190 832F      		mov r24,r19
+ 700               	.LVL49:
+  47:quantum/process_keycode/process_combo.c ****     }
+ 701               		.loc 1 47 9 is_stmt 0 view .LVU169
+ 702 0192 0E94 0000 		call process_combo_event
+ 703               	.LVL50:
+  47:quantum/process_keycode/process_combo.c ****     }
+ 704               		.loc 1 47 9 view .LVU170
+ 705 0196 00C0      		rjmp .L39
+ 706               	.LVL51:
+ 707               	.L36:
+  47:quantum/process_keycode/process_combo.c ****     }
+ 708               		.loc 1 47 9 view .LVU171
+ 709               	.LBE50:
+ 710               	.LBE49:
+ 711               	.LBE51:
+ 712               	.LBE52:
+ 106:quantum/process_keycode/process_combo.c ****             send_combo(combo->keycode, false);
+ 713               		.loc 1 106 9 is_stmt 1 view .LVU172
+ 106:quantum/process_keycode/process_combo.c ****             send_combo(combo->keycode, false);
+ 714               		.loc 1 106 13 is_stmt 0 view .LVU173
+ 715 0198 A401      		movw r20,r8
+ 716 019a 00C0      		rjmp 2f
+ 717               		1:
+ 718 019c 440F      		lsl r20
+ 719 019e 551F      		rol r21
+ 720               		2:
+ 721 01a0 2A95      		dec r18
+ 722 01a2 02F4      		brpl 1b
+ 723 01a4 4150      		subi r20,1
+ 724 01a6 5109      		sbc r21,__zero_reg__
+ 106:quantum/process_keycode/process_combo.c ****             send_combo(combo->keycode, false);
+ 725               		.loc 1 106 12 view .LVU174
+ 726 01a8 9417      		cp r25,r20
+ 727 01aa 1506      		cpc __zero_reg__,r21
+ 728 01ac 01F4      		brne .L51
+ 107:quantum/process_keycode/process_combo.c ****         } else {
+ 729               		.loc 1 107 13 is_stmt 1 view .LVU175
+ 730 01ae 8281      		ldd r24,Z+2
+ 731 01b0 9381      		ldd r25,Z+3
+ 732               	.LVL52:
+ 733               	.LBB53:
+ 734               	.LBI53:
+  39:quantum/process_keycode/process_combo.c ****     if (action) {
+ 735               		.loc 1 39 20 view .LVU176
+ 736               	.LBB54:
+  40:quantum/process_keycode/process_combo.c ****         if (pressed) {
+ 737               		.loc 1 40 5 view .LVU177
+  40:quantum/process_keycode/process_combo.c ****         if (pressed) {
+ 738               		.loc 1 40 8 is_stmt 0 view .LVU178
+ 739 01b2 0097      		sbiw r24,0
+ 740 01b4 01F0      		breq .L41
+  41:quantum/process_keycode/process_combo.c ****             register_code16(action);
+ 741               		.loc 1 41 9 is_stmt 1 view .LVU179
+  44:quantum/process_keycode/process_combo.c ****         }
+ 742               		.loc 1 44 13 view .LVU180
+ 743 01b6 0E94 0000 		call unregister_code16
+ 744               	.LVL53:
+ 745               	.L40:
+  44:quantum/process_keycode/process_combo.c ****         }
+ 746               		.loc 1 44 13 is_stmt 0 view .LVU181
+ 747               	.LBE54:
+ 748               	.LBE53:
+ 113:quantum/process_keycode/process_combo.c ****     }
+ 749               		.loc 1 113 9 is_stmt 1 view .LVU182
+ 113:quantum/process_keycode/process_combo.c ****     }
+ 750               		.loc 1 113 9 view .LVU183
+ 751 01ba C601      		movw r24,r12
+ 752 01bc 65E0      		ldi r22,lo8(5)
+ 753 01be 70E0      		ldi r23,0
+ 754 01c0 0E94 0000 		call __mulhi3
+ 755 01c4 FC01      		movw r30,r24
+ 756 01c6 E050      		subi r30,lo8(-(key_combos))
+ 757 01c8 F040      		sbci r31,hi8(-(key_combos))
+ 758 01ca A094      		com r10
+ 759 01cc 9481      		ldd r25,Z+4
+ 760 01ce A922      		and r10,r25
+ 761 01d0 A482      		std Z+4,r10
+ 762 01d2 00C0      		rjmp .L35
+ 763               	.LVL54:
+ 764               	.L41:
+ 765               	.LBB58:
+ 766               	.LBB57:
+ 767               	.LBB55:
+ 768               	.LBI55:
+  39:quantum/process_keycode/process_combo.c ****     if (action) {
+ 769               		.loc 1 39 20 view .LVU184
+ 770               	.LBB56:
+  47:quantum/process_keycode/process_combo.c ****     }
+ 771               		.loc 1 47 9 view .LVU185
+ 772 01d4 60E0      		ldi r22,0
+ 773 01d6 832F      		mov r24,r19
+ 774               	.LVL55:
+  47:quantum/process_keycode/process_combo.c ****     }
+ 775               		.loc 1 47 9 is_stmt 0 view .LVU186
+ 776 01d8 0E94 0000 		call process_combo_event
+ 777               	.LVL56:
+  47:quantum/process_keycode/process_combo.c ****     }
+ 778               		.loc 1 47 9 view .LVU187
+ 779 01dc 00C0      		rjmp .L40
+ 780               	.LVL57:
+ 781               	.L51:
+  47:quantum/process_keycode/process_combo.c ****     }
+ 782               		.loc 1 47 9 view .LVU188
+ 783               	.LBE56:
+ 784               	.LBE55:
+ 785               	.LBE57:
+ 786               	.LBE58:
+ 110:quantum/process_keycode/process_combo.c ****         }
+ 787               		.loc 1 110 29 view .LVU189
+ 788 01de 612C      		mov r6,__zero_reg__
+ 789               	.LVL58:
+ 110:quantum/process_keycode/process_combo.c ****         }
+ 790               		.loc 1 110 29 view .LVU190
+ 791 01e0 00C0      		rjmp .L40
+ 792               	.LVL59:
+ 793               	.L45:
+ 110:quantum/process_keycode/process_combo.c ****         }
+ 794               		.loc 1 110 29 view .LVU191
+ 795               	.LBE60:
+ 796               	.LBE62:
+ 797               	.LBE64:
+ 156:quantum/process_keycode/process_combo.c ****         /* if no combos claim the key we need to emit the keybuffer */
+ 798               		.loc 1 156 12 is_stmt 1 view .LVU192
+ 156:quantum/process_keycode/process_combo.c ****         /* if no combos claim the key we need to emit the keybuffer */
+ 799               		.loc 1 156 15 is_stmt 0 view .LVU193
+ 800 01e2 C111      		cpse r28,__zero_reg__
+ 801 01e4 00C0      		rjmp .L47
+ 158:quantum/process_keycode/process_combo.c **** 
+ 802               		.loc 1 158 9 is_stmt 1 view .LVU194
+ 803 01e6 81E0      		ldi r24,lo8(1)
+ 804 01e8 0E94 0000 		call dump_key_buffer
+ 805               	.LVL60:
+ 161:quantum/process_keycode/process_combo.c ****             timer     = 0;
+ 806               		.loc 1 161 9 view .LVU195
+ 161:quantum/process_keycode/process_combo.c ****             timer     = 0;
+ 807               		.loc 1 161 12 is_stmt 0 view .LVU196
+ 808 01ec DD23      		tst r29
+ 809 01ee 01F4      		brne .+2
+ 810 01f0 00C0      		rjmp .L46
+ 162:quantum/process_keycode/process_combo.c ****             is_active = true;
+ 811               		.loc 1 162 13 is_stmt 1 view .LVU197
+ 162:quantum/process_keycode/process_combo.c ****             is_active = true;
+ 812               		.loc 1 162 23 is_stmt 0 view .LVU198
+ 813 01f2 1092 0000 		sts timer+1,__zero_reg__
+ 814 01f6 1092 0000 		sts timer,__zero_reg__
+ 163:quantum/process_keycode/process_combo.c ****         }
+ 815               		.loc 1 163 13 is_stmt 1 view .LVU199
+ 163:quantum/process_keycode/process_combo.c ****         }
+ 816               		.loc 1 163 23 is_stmt 0 view .LVU200
+ 817 01fa 81E0      		ldi r24,lo8(1)
+ 818 01fc 8093 0000 		sts is_active,r24
+ 819 0200 00C0      		rjmp .L46
+ 820               	.L47:
+ 165:quantum/process_keycode/process_combo.c ****         /* otherwise the key is consumed and placed in the buffer */
+ 821               		.loc 1 165 12 is_stmt 1 view .LVU201
+ 165:quantum/process_keycode/process_combo.c ****         /* otherwise the key is consumed and placed in the buffer */
+ 822               		.loc 1 165 15 is_stmt 0 view .LVU202
+ 823 0202 F701      		movw r30,r14
+ 824 0204 8281      		ldd r24,Z+2
+ 825 0206 8823      		tst r24
+ 826 0208 01F4      		brne .+2
+ 827 020a 00C0      		rjmp .L46
+ 165:quantum/process_keycode/process_combo.c ****         /* otherwise the key is consumed and placed in the buffer */
+ 828               		.loc 1 165 38 discriminator 1 view .LVU203
+ 829 020c 8091 0000 		lds r24,is_active
+ 830 0210 8823      		tst r24
+ 831 0212 01F4      		brne .+2
+ 832 0214 00C0      		rjmp .L46
+ 167:quantum/process_keycode/process_combo.c **** 
+ 833               		.loc 1 167 9 is_stmt 1 view .LVU204
+ 167:quantum/process_keycode/process_combo.c **** 
+ 834               		.loc 1 167 17 is_stmt 0 view .LVU205
+ 835 0216 0E94 0000 		call timer_read
+ 836               	.LVL61:
+ 167:quantum/process_keycode/process_combo.c **** 
+ 837               		.loc 1 167 15 view .LVU206
+ 838 021a 9093 0000 		sts timer+1,r25
+ 839 021e 8093 0000 		sts timer,r24
+ 169:quantum/process_keycode/process_combo.c **** #ifdef COMBO_ALLOW_ACTION_KEYS
+ 840               		.loc 1 169 9 is_stmt 1 view .LVU207
+ 169:quantum/process_keycode/process_combo.c **** #ifdef COMBO_ALLOW_ACTION_KEYS
+ 841               		.loc 1 169 25 is_stmt 0 view .LVU208
+ 842 0222 E091 0000 		lds r30,buffer_size
+ 169:quantum/process_keycode/process_combo.c **** #ifdef COMBO_ALLOW_ACTION_KEYS
+ 843               		.loc 1 169 12 view .LVU209
+ 844 0226 E830      		cpi r30,lo8(8)
+ 845 0228 00F0      		brlo .+2
+ 846 022a 00C0      		rjmp .L46
+ 173:quantum/process_keycode/process_combo.c **** #endif
+ 847               		.loc 1 173 13 is_stmt 1 view .LVU210
+ 173:quantum/process_keycode/process_combo.c **** #endif
+ 848               		.loc 1 173 35 is_stmt 0 view .LVU211
+ 849 022c 81E0      		ldi r24,lo8(1)
+ 850 022e 8E0F      		add r24,r30
+ 851 0230 8093 0000 		sts buffer_size,r24
+ 852 0234 F0E0      		ldi r31,0
+ 173:quantum/process_keycode/process_combo.c **** #endif
+ 853               		.loc 1 173 39 view .LVU212
+ 854 0236 EE0F      		lsl r30
+ 855 0238 FF1F      		rol r31
+ 856 023a E050      		subi r30,lo8(-(key_buffer))
+ 857 023c F040      		sbci r31,hi8(-(key_buffer))
+ 858 023e 1183      		std Z+1,r17
+ 859 0240 0083      		st Z,r16
+ 860 0242 00C0      		rjmp .L46
+ 861               		.cfi_endproc
+ 862               	.LFE113:
+ 864               		.section	.text.is_combo_enabled,"ax",@progbits
+ 865               	.global	is_combo_enabled
+ 867               	is_combo_enabled:
+ 868               	.LFB118:
+ 869               		.loc 1 207 29 is_stmt 1 view -0
+ 870               		.cfi_startproc
+ 871               	/* prologue: function */
+ 872               	/* frame size = 0 */
+ 873               	/* stack size = 0 */
+ 874               	.L__stack_usage = 0
+ 875               		.loc 1 207 31 view .LVU214
+ 876               		.loc 1 207 1 is_stmt 0 view .LVU215
+ 877 0000 8091 0000 		lds r24,b_combo_enable
+ 878               	/* epilogue start */
+ 879 0004 0895      		ret
+ 880               		.cfi_endproc
+ 881               	.LFE118:
+ 883               		.section	.bss.key_buffer,"aw",@nobits
+ 886               	key_buffer:
+ 887 0000 0000 0000 		.zero	16
+ 887      0000 0000 
+ 887      0000 0000 
+ 887      0000 0000 
+ 888               		.section	.bss.buffer_size,"aw",@nobits
+ 891               	buffer_size:
+ 892 0000 00        		.zero	1
+ 893               		.section	.data.b_combo_enable,"aw"
+ 896               	b_combo_enable:
+ 897 0000 01        		.byte	1
+ 898               		.section	.bss.is_active,"aw",@nobits
+ 901               	is_active:
+ 902 0000 00        		.zero	1
+ 903               		.section	.bss.drop_buffer,"aw",@nobits
+ 906               	drop_buffer:
+ 907 0000 00        		.zero	1
+ 908               		.section	.bss.current_combo_index,"aw",@nobits
+ 911               	current_combo_index:
+ 912 0000 00        		.zero	1
+ 913               		.section	.bss.timer,"aw",@nobits
+ 916               	timer:
+ 917 0000 0000      		.zero	2
+ 918               		.weak	key_combos
+ 919               		.section	.bss.key_combos,"aw",@nobits
+ 922               	key_combos:
+ 923 0000 0000 0000 		.zero	10
+ 923      0000 0000 
+ 923      0000 
+ 924               		.text
+ 925               	.Letext0:
+ 926               		.file 2 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+ 927               		.file 3 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+ 928               		.file 4 "tmk_core/common/keyboard.h"
+ 929               		.file 5 "tmk_core/common/action.h"
+ 930               		.file 6 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../StdRequestType.h"
+ 931               		.file 7 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../DeviceStandardReq.h"
+ 932               		.file 8 "lib/lufa/LUFA/Drivers/USB/Core/USBTask.h"
+ 933               		.file 9 "lib/lufa/LUFA/Drivers/USB/Core/HostStandardReq.h"
+ 934               		.file 10 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchai
+ 935               		.file 11 "tmk_core/common/report.h"
+ 936               		.file 12 "tmk_core/common/host.h"
+ 937               		.file 13 "tmk_core/common/debug.h"
+ 938               		.file 14 "quantum/keycode_config.h"
+ 939               		.file 15 "quantum/keymap.h"
+ 940               		.file 16 "./quantum/color.h"
+ 941               		.file 17 "quantum/rgblight.h"
+ 942               		.file 18 "tmk_core/common/action_layer.h"
+ 943               		.file 19 "tmk_core/common/timer.h"
+ 944               		.file 20 "tmk_core/common/action_util.h"
+ 945               		.file 21 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchai
+ 946               		.file 22 "quantum/process_keycode/process_unicode_common.h"
+ 947               		.file 23 "quantum/process_keycode/process_tap_dance.h"
+ 948               		.file 24 "quantum/quantum.h"
+ 949               		.file 25 "quantum/process_keycode/process_combo.h"
+ 950               		.file 26 "quantum/quantum_keycodes.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 process_combo.c
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:2      *ABS*:0000003e __SP_H__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:3      *ABS*:0000003d __SP_L__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:4      *ABS*:0000003f __SREG__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:5      *ABS*:00000000 __tmp_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:6      *ABS*:00000001 __zero_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:12     .text.dump_key_buffer:00000000 dump_key_buffer
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:891    .bss.buffer_size:00000000 buffer_size
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:886    .bss.key_buffer:00000000 key_buffer
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:97     .text.process_combo_event:00000000 process_combo_event
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:116    .text.matrix_scan_combo:00000000 matrix_scan_combo
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:896    .data.b_combo_enable:00000000 b_combo_enable
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:901    .bss.is_active:00000000 is_active
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:916    .bss.timer:00000000 timer
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:161    .text.combo_enable:00000000 combo_enable
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:182    .text.combo_disable:00000000 combo_disable
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:209    .text.combo_toggle:00000000 combo_toggle
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:245    .text.process_combo:00000000 process_combo
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:906    .bss.drop_buffer:00000000 drop_buffer
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:911    .bss.current_combo_index:00000000 current_combo_index
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:922    .bss.key_combos:00000000 key_combos
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cctIk6V7.s:867    .text.is_combo_enabled:00000000 is_combo_enabled
+
+UNDEFINED SYMBOLS
+register_code16
+send_keyboard_report
+timer_elapsed
+timer_read
+__mulhi3
+unregister_code16
+__do_copy_data
+__do_clear_bss
