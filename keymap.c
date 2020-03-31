@@ -16,6 +16,7 @@ enum layers_keymap {
   _CHAT
 };
 
+
 #define _QW _QWERTY
 #define _GM _GAME
 #define _RT _RTHUMB
