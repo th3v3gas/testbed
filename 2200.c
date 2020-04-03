@@ -277,7 +277,7 @@ combo_t key_combos[COMBO_COUNT] = {
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-/* _QW _QWERTY      DEFAULT LAYER
+/* _QW _QWERTY
 *	,-------------------------------------------------------------------------.
 *	|esCTL|  Q  |  W  |  E  |  R  |  T  |  Y  |  U  |  I  |  O  |  P  |Bspace |
 *	|-------------------------------------------------------------------------+
@@ -285,29 +285,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 *	|-------------------------------------------------------------------------+
 *	| shift |  Z  |  X  |  C  |  V  |  B  |  N  |M(!) |,(!?)|.(?) |QGWOX|SFTEN| combos (M+,)=! (,+.)=?; tap dance QGWOX
 *	|-------------------------------------------------------------------------+
-*	|     |     |     |alt -|/ _TH |   space   |* _TH |PLDIS|     |     |     | tap dance PLDIS
+*	|     |     |     |  -  |/ _TH |   space   |* _TH |PLDIS|     |     |     | tap dance PLDIS
 *	`-------------------------------------------------------------------------'
 */
-	[_QWERTY] = LAYOUT(CTL_T(KC_ESC),KC_Q,KC_W,KC_E,KC_R,KC_T,KC_Y,KC_U,KC_I,KC_O,KC_P,KC_BSPC,
-		LT(_FN,KC_TAB),KC_A,KC_S,KC_D,KC_F,KC_G,KC_H,KC_J,KC_K,KC_L,KC_SCLN,TD(TD_FNWIN),
-		KC_LSFT,KC_Z,KC_X,KC_C,KC_V,KC_B,KC_N,KC_M,KC_COMM,KC_DOT,TD(TD_QGWOX),KC_SFTENT,
-		_______,_______,_______,LALT_T(KC_PMNS),LT(_TH,KC_PSLS),KC_SPC,LT(_TH,KC_PAST),TD(TD_PLDIS),_______,_______,_______),
-
-/* _GM _GAME        DEFAULT LAYER
-*	,-------------------------------------------------------------------------.
-*	| esc |  T  |  Q  |  W  |  E  |  R  |  J  |  U  |  I  |  O  |  P  |Bspace |
-*	|-------------------------------------------------------------------------+
-*	|tb_GFN|  G  |  A  |  S  |  D  |  F  |  H  |GCHAL|GCHTM|_CHAT|  ;  |FNWIN | macro GCHAL, GCHTM; tap dance FNWIN
-*	|-------------------------------------------------------------------------+
-*	| shift |  B  |  Z  |  X  |  C  |  V  |  N  |M(!) |,(!?)|.(?) |QGWOX|SFTEN| combos (M+,)=! (,+.)=?; tap dance QGWOX
-*	|-------------------------------------------------------------------------+
-*	|     |     |     | alt | ctl  |   space   |* _TH |GMDIS|     |     |     | tap dance GMDIS
-*	`-------------------------------------------------------------------------'
-*/
-	[_GAME] = LAYOUT(KC_ESC,KC_T,KC_Q,KC_W,KC_E,KC_R,KC_J,KC_U,KC_I,KC_O,KC_P,KC_BSPC,
-    LT(_GFN,KC_TAB),KC_G,KC_A,KC_S,KC_D,KC_F,KC_H,M_GCHAL,M_GCHTM,TO(_CH),KC_SCLN,TD(TD_FNWIN),
-    KC_LSFT,KC_B,KC_Z,KC_X,KC_C,KC_V,KC_N,KC_M,KC_COMM,KC_DOT,TD(TD_QGWOX),KC_SFTENT,
-    _______,_______,_______,KC_LALT,KC_LCTL,KC_SPC,LT(_TH,KC_PAST),TD(TD_GMDIS),_______,_______,_______),
+	[_QWERTY] = LAYOUT(CTL_T(KC_ESC), KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_BSPC,
+		LT(_FN,KC_TAB), KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, KC_SCLN, TD(TD_FNWIN),
+		KC_LSFT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_N, KC_M, KC_COMM, KC_DOT, TD(TD_QGWOX), KC_SFTENT,
+		_______, _______, _______, LALT_T(KC_PMNS), LT(_TH,KC_PSLS), KC_SPC, LT(_TH,KC_PAST), TD(TD_PLDIS), _______, _______, _______),
 
 /* _TH _THUMB
 *	,-------------------------------------------------------------------------.
@@ -341,6 +325,23 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 		KC_LSFT, _______, _______, _______, _______, _______, KC_HOME, KC_PGDN, KC_PGUP, KC_END, _______, KC_RSFT,
 		_______, _______, _______, KC_P1, KC_P2, KC_P3, _______, _______, _______, _______, _______),
 
+/* _GM _GAME
+*	,-------------------------------------------------------------------------.
+*	| esc |  T  |  Q  |  W  |  E  |  R  |  J  |     |     |     |     | _CHAT |
+*	|-------------------------------------------------------------------------+
+*	|  tab  |  G  |  A  |  S  |  D  |  F  |    |GCHAL|     |     |     |FNWIN | macro GCHAL, GCHTM; tap dance FNWIN
+*	|-------------------------------------------------------------------------+
+*	| shift |  B  |  Z  |  X  |  C  |  V  |     |     |     |     |     |     |
+*	|-------------------------------------------------------------------------+
+*	|     |     |     |  -  |  /   |   space   |      |GMDIS|     |     |     | tap dance GMDIS
+*	`-------------------------------------------------------------------------'
+*/
+	[_GAME] = LAYOUT(KC_ESC, KC_T, KC_Q, KC_W, KC_E, KC_R, KC_J, _______, _______, _______, _______, TO(_CH),
+		_______, KC_G, KC_A, KC_S, KC_D, KC_F, _______, M_GCHAL, M_GCHTM, _______, _______, TD(TD_FNWIN),
+		_______, KC_B, KC_Z, KC_X, KC_C, KC_V, _______, KC_M, _______, _______, _______, _______,
+		_______, _______, _______, KC_PMNS, KC_PSLS, _______, _______, TD(TD_GMDIS), _______, _______, _______),
+/*
+
 /*  mouse buttons use np
     |___| 3 | 2 |
     | 5 | 0 | 7 |scrlu +|
@@ -349,20 +350,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 /* _GFN _GAME_FUNCTION
 *	,-------------------------------------------------------------------------.
-*	|     | F1  | F2  |pgup | F3  | F4  |  Y  |     |     |     |     |       |
+*	| esc |  j  |  u  |pgup |  o  |  p  |     |     |     |     |     | _CHAT |
 *	|-------------------------------------------------------------------------+
-*	|GFMtab| F5  |home |pgdn |end  | tab |     |  J  |  K  |  L  |     |FNWIN |
-*	|------------------------------------------------------------------------+
-*	|       | F6  | F7  | F8  | F9  | F10 |     |     |     |     |     |     |
+*	|  tab  |  h  |home |pgdn |end  |  ;  |    |     |     |     |     |FNWIN | macro GCHAL, GCHTM; tap dance FNWIN
 *	|-------------------------------------------------------------------------+
-*	|     |     |     |  -  |  *   |   space   |      |GMDIS|     |     |     | tap dance GMDIS
+*	| shift |  n  |  m  |  ,  |  .  |  i  |     |     |     |     |     |     |
+*	|-------------------------------------------------------------------------+
+*	|     |     |     |  -  |  /   |   space   |      |     |     |     |     | tap dance GMDIS
 *	`-------------------------------------------------------------------------'
 */
-	[_GAME] = LAYOUT(
-    _______,  KC_F1,  KC_F2,KC_PGUP,  KC_F3,  KC_F4,   KC_Y,_______,_______,_______,_______,_______,
-    _______,  KC_F5,KC_HOME,KC_PGDN, KC_END, KC_TAB,_______,   KC_J,   KC_K,   KC_L,_______,_______,
-    _______,  KC_F6,  KC_F7,  KC_F8,  KC_F9, KC_F10,_______,_______,_______,_______,_______,_______,
-    _______,_______,_______,KC_MINS,KC_PAST,_______,LT(_TH,KC_PAST),TD(TD_GMDIS),_______,_______,_______),
+	[_GAME] = LAYOUT
+    (KC_ESC,   KC_J,   KC_U,KC_PGUP,   KC_O,   KC_P,_______,_______,_______,_______,_______,TO(_CH),
+		_______,   KC_H,KC_HOME,KC_PGDN, KC_END,   KC_:,_______,M_GCHAL,M_GCHTM,_______,_______,TD(TD_FNWIN),
+		_______,   KC_N,   KC_M,KC_COMM, KC_DOT,   KC_V,_______,   KC_M,_______,_______,_______,_______,
+		_______,_______,_______,KC_PMNS,KC_PSLS _______,_______,TD(TD_GMDIS), _______, _______, _______),
 
 /* _CH _CHAT
 *	,-------------------------------------------------------------------------.
