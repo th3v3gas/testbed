@@ -1,0 +1,606 @@
+   1               		.file	"process_rgb.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.handleKeycodeRGB,"ax",@progbits
+  12               	handleKeycodeRGB:
+  13               	.LVL0:
+  14               	.LFB125:
+  15               		.file 1 "quantum/process_keycode/process_rgb.c"
+   1:quantum/process_keycode/process_rgb.c **** /* Copyright 2019
+   2:quantum/process_keycode/process_rgb.c ****  *
+   3:quantum/process_keycode/process_rgb.c ****  * This program is free software: you can redistribute it and/or modify
+   4:quantum/process_keycode/process_rgb.c ****  * it under the terms of the GNU General Public License as published by
+   5:quantum/process_keycode/process_rgb.c ****  * the Free Software Foundation, either version 2 of the License, or
+   6:quantum/process_keycode/process_rgb.c ****  * (at your option) any later version.
+   7:quantum/process_keycode/process_rgb.c ****  *
+   8:quantum/process_keycode/process_rgb.c ****  * This program is distributed in the hope that it will be useful,
+   9:quantum/process_keycode/process_rgb.c ****  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  10:quantum/process_keycode/process_rgb.c ****  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  11:quantum/process_keycode/process_rgb.c ****  * GNU General Public License for more details.
+  12:quantum/process_keycode/process_rgb.c ****  *
+  13:quantum/process_keycode/process_rgb.c ****  * You should have received a copy of the GNU General Public License
+  14:quantum/process_keycode/process_rgb.c ****  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  15:quantum/process_keycode/process_rgb.c ****  */
+  16:quantum/process_keycode/process_rgb.c **** #include "process_rgb.h"
+  17:quantum/process_keycode/process_rgb.c **** #include "rgb.h"
+  18:quantum/process_keycode/process_rgb.c **** 
+  19:quantum/process_keycode/process_rgb.c **** typedef void (*rgb_func_pointer)(void);
+  20:quantum/process_keycode/process_rgb.c **** 
+  21:quantum/process_keycode/process_rgb.c **** /**
+  22:quantum/process_keycode/process_rgb.c ****  * Wrapper for inc/dec rgb keycode
+  23:quantum/process_keycode/process_rgb.c ****  *
+  24:quantum/process_keycode/process_rgb.c ****  * noinline to optimise for firmware size not speed (not in hot path)
+  25:quantum/process_keycode/process_rgb.c ****  */
+  26:quantum/process_keycode/process_rgb.c **** static void __attribute__((noinline)) handleKeycodeRGB(const uint8_t is_shifted, const rgb_func_poi
+  16               		.loc 1 26 148 view -0
+  17               		.cfi_startproc
+  18               	/* prologue: function */
+  19               	/* frame size = 0 */
+  20               	/* stack size = 0 */
+  21               	.L__stack_usage = 0
+  27:quantum/process_keycode/process_rgb.c ****     if (is_shifted) {
+  22               		.loc 1 27 5 view .LVU1
+  28:quantum/process_keycode/process_rgb.c ****         dec_func();
+  23               		.loc 1 28 9 is_stmt 0 view .LVU2
+  24 0000 FA01      		movw r30,r20
+  27:quantum/process_keycode/process_rgb.c ****     if (is_shifted) {
+  25               		.loc 1 27 8 view .LVU3
+  26 0002 8111      		cpse r24,__zero_reg__
+  27 0004 00C0      		rjmp .L3
+  29:quantum/process_keycode/process_rgb.c ****     } else {
+  30:quantum/process_keycode/process_rgb.c ****         inc_func();
+  28               		.loc 1 30 9 is_stmt 1 view .LVU4
+  29 0006 FB01      		movw r30,r22
+  30               	.L3:
+  31               		.loc 1 30 9 is_stmt 0 view .LVU5
+  32 0008 0994      		ijmp
+  33               	.LVL1:
+  34               		.loc 1 30 9 view .LVU6
+  35               		.cfi_endproc
+  36               	.LFE125:
+  38               		.section	.text.rgb_matrix_toggle,"ax",@progbits
+  39               		.weak	rgb_matrix_toggle
+  41               	rgb_matrix_toggle:
+  42               	.LFB114:
+  43               		.file 2 "quantum/rgb.h"
+   1:quantum/rgb.h **** /* Copyright 2017 Jack Humbert
+   2:quantum/rgb.h ****  *
+   3:quantum/rgb.h ****  * This program is free software: you can redistribute it and/or modify
+   4:quantum/rgb.h ****  * it under the terms of the GNU General Public License as published by
+   5:quantum/rgb.h ****  * the Free Software Foundation, either version 2 of the License, or
+   6:quantum/rgb.h ****  * (at your option) any later version.
+   7:quantum/rgb.h ****  *
+   8:quantum/rgb.h ****  * This program is distributed in the hope that it will be useful,
+   9:quantum/rgb.h ****  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  10:quantum/rgb.h ****  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  11:quantum/rgb.h ****  * GNU General Public License for more details.
+  12:quantum/rgb.h ****  *
+  13:quantum/rgb.h ****  * You should have received a copy of the GNU General Public License
+  14:quantum/rgb.h ****  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  15:quantum/rgb.h ****  */
+  16:quantum/rgb.h **** 
+  17:quantum/rgb.h **** #ifndef RGB_H
+  18:quantum/rgb.h **** #define RGB_H
+  19:quantum/rgb.h **** 
+  20:quantum/rgb.h **** __attribute__((weak)) void rgblight_toggle(void){};
+  44               		.loc 2 20 49 is_stmt 1 view -0
+  45               		.cfi_startproc
+  46               	/* prologue: function */
+  47               	/* frame size = 0 */
+  48               	/* stack size = 0 */
+  49               	.L__stack_usage = 0
+  50               		.loc 2 20 50 view .LVU8
+  51               	/* epilogue start */
+  52               		.loc 2 20 1 is_stmt 0 view .LVU9
+  53 0000 0895      		ret
+  54               		.cfi_endproc
+  55               	.LFE114:
+  57               		.set	rgb_matrix_toggle.localalias.0,rgb_matrix_toggle
+  58               		.section	.text.rgb_matrix_step,"ax",@progbits
+  59               		.weak	rgb_matrix_step
+  61               	rgb_matrix_step:
+  62               	.LFB129:
+  63               		.cfi_startproc
+  64               	/* prologue: function */
+  65               	/* frame size = 0 */
+  66               	/* stack size = 0 */
+  67               	.L__stack_usage = 0
+  68               	/* epilogue start */
+  69 0000 0895      		ret
+  70               		.cfi_endproc
+  71               	.LFE129:
+  73               		.section	.text.rgb_matrix_step_reverse,"ax",@progbits
+  74               		.weak	rgb_matrix_step_reverse
+  76               	rgb_matrix_step_reverse:
+  77               	.LFB131:
+  78               		.cfi_startproc
+  79               	/* prologue: function */
+  80               	/* frame size = 0 */
+  81               	/* stack size = 0 */
+  82               	.L__stack_usage = 0
+  83               	/* epilogue start */
+  84 0000 0895      		ret
+  85               		.cfi_endproc
+  86               	.LFE131:
+  88               		.section	.text.rgb_matrix_increase_hue,"ax",@progbits
+  89               		.weak	rgb_matrix_increase_hue
+  91               	rgb_matrix_increase_hue:
+  92               	.LFB133:
+  93               		.cfi_startproc
+  94               	/* prologue: function */
+  95               	/* frame size = 0 */
+  96               	/* stack size = 0 */
+  97               	.L__stack_usage = 0
+  98               	/* epilogue start */
+  99 0000 0895      		ret
+ 100               		.cfi_endproc
+ 101               	.LFE133:
+ 103               		.section	.text.rgb_matrix_decrease_hue,"ax",@progbits
+ 104               		.weak	rgb_matrix_decrease_hue
+ 106               	rgb_matrix_decrease_hue:
+ 107               	.LFB135:
+ 108               		.cfi_startproc
+ 109               	/* prologue: function */
+ 110               	/* frame size = 0 */
+ 111               	/* stack size = 0 */
+ 112               	.L__stack_usage = 0
+ 113               	/* epilogue start */
+ 114 0000 0895      		ret
+ 115               		.cfi_endproc
+ 116               	.LFE135:
+ 118               		.section	.text.rgb_matrix_increase_sat,"ax",@progbits
+ 119               		.weak	rgb_matrix_increase_sat
+ 121               	rgb_matrix_increase_sat:
+ 122               	.LFB137:
+ 123               		.cfi_startproc
+ 124               	/* prologue: function */
+ 125               	/* frame size = 0 */
+ 126               	/* stack size = 0 */
+ 127               	.L__stack_usage = 0
+ 128               	/* epilogue start */
+ 129 0000 0895      		ret
+ 130               		.cfi_endproc
+ 131               	.LFE137:
+ 133               		.section	.text.rgb_matrix_decrease_sat,"ax",@progbits
+ 134               		.weak	rgb_matrix_decrease_sat
+ 136               	rgb_matrix_decrease_sat:
+ 137               	.LFB139:
+ 138               		.cfi_startproc
+ 139               	/* prologue: function */
+ 140               	/* frame size = 0 */
+ 141               	/* stack size = 0 */
+ 142               	.L__stack_usage = 0
+ 143               	/* epilogue start */
+ 144 0000 0895      		ret
+ 145               		.cfi_endproc
+ 146               	.LFE139:
+ 148               		.section	.text.rgb_matrix_increase_val,"ax",@progbits
+ 149               		.weak	rgb_matrix_increase_val
+ 151               	rgb_matrix_increase_val:
+ 152               	.LFB141:
+ 153               		.cfi_startproc
+ 154               	/* prologue: function */
+ 155               	/* frame size = 0 */
+ 156               	/* stack size = 0 */
+ 157               	.L__stack_usage = 0
+ 158               	/* epilogue start */
+ 159 0000 0895      		ret
+ 160               		.cfi_endproc
+ 161               	.LFE141:
+ 163               		.section	.text.rgb_matrix_decrease_val,"ax",@progbits
+ 164               		.weak	rgb_matrix_decrease_val
+ 166               	rgb_matrix_decrease_val:
+ 167               	.LFB143:
+ 168               		.cfi_startproc
+ 169               	/* prologue: function */
+ 170               	/* frame size = 0 */
+ 171               	/* stack size = 0 */
+ 172               	.L__stack_usage = 0
+ 173               	/* epilogue start */
+ 174 0000 0895      		ret
+ 175               		.cfi_endproc
+ 176               	.LFE143:
+ 178               		.section	.text.rgb_matrix_increase_speed,"ax",@progbits
+ 179               		.weak	rgb_matrix_increase_speed
+ 181               	rgb_matrix_increase_speed:
+ 182               	.LFB145:
+ 183               		.cfi_startproc
+ 184               	/* prologue: function */
+ 185               	/* frame size = 0 */
+ 186               	/* stack size = 0 */
+ 187               	.L__stack_usage = 0
+ 188               	/* epilogue start */
+ 189 0000 0895      		ret
+ 190               		.cfi_endproc
+ 191               	.LFE145:
+ 193               		.section	.text.rgb_matrix_decrease_speed,"ax",@progbits
+ 194               		.weak	rgb_matrix_decrease_speed
+ 196               	rgb_matrix_decrease_speed:
+ 197               	.LFB147:
+ 198               		.cfi_startproc
+ 199               	/* prologue: function */
+ 200               	/* frame size = 0 */
+ 201               	/* stack size = 0 */
+ 202               	.L__stack_usage = 0
+ 203               	/* epilogue start */
+ 204 0000 0895      		ret
+ 205               		.cfi_endproc
+ 206               	.LFE147:
+ 208               		.section	.text.process_rgb,"ax",@progbits
+ 209               	.global	process_rgb
+ 211               	process_rgb:
+ 212               	.LVL2:
+ 213               	.LFB127:
+  31:quantum/process_keycode/process_rgb.c ****     }
+  32:quantum/process_keycode/process_rgb.c **** }
+  33:quantum/process_keycode/process_rgb.c **** 
+  34:quantum/process_keycode/process_rgb.c **** /**
+  35:quantum/process_keycode/process_rgb.c ****  * Wrapper for animation mode
+  36:quantum/process_keycode/process_rgb.c ****  *   - if not in animation family -> jump to that animation
+  37:quantum/process_keycode/process_rgb.c ****  *   - otherwise -> wrap round animation speed
+  38:quantum/process_keycode/process_rgb.c ****  *
+  39:quantum/process_keycode/process_rgb.c ****  * noinline to optimise for firmware size not speed (not in hot path)
+  40:quantum/process_keycode/process_rgb.c ****  */
+  41:quantum/process_keycode/process_rgb.c **** static void __attribute__((noinline, unused)) handleKeycodeRGBMode(const uint8_t start, const uint8
+  42:quantum/process_keycode/process_rgb.c ****     if ((start <= rgblight_get_mode()) && (rgblight_get_mode() < end)) {
+  43:quantum/process_keycode/process_rgb.c ****         rgblight_step();
+  44:quantum/process_keycode/process_rgb.c ****     } else {
+  45:quantum/process_keycode/process_rgb.c ****         rgblight_mode(start);
+  46:quantum/process_keycode/process_rgb.c ****     }
+  47:quantum/process_keycode/process_rgb.c **** }
+  48:quantum/process_keycode/process_rgb.c **** 
+  49:quantum/process_keycode/process_rgb.c **** /**
+  50:quantum/process_keycode/process_rgb.c ****  * Handle keycodes for both rgblight and rgbmatrix
+  51:quantum/process_keycode/process_rgb.c ****  */
+  52:quantum/process_keycode/process_rgb.c **** bool process_rgb(const uint16_t keycode, const keyrecord_t *record) {
+ 214               		.loc 1 52 69 is_stmt 1 view -0
+ 215               		.cfi_startproc
+ 216               		.loc 1 52 69 is_stmt 0 view .LVU11
+ 217 0000 0F93      		push r16
+ 218               	.LCFI0:
+ 219               		.cfi_def_cfa_offset 3
+ 220               		.cfi_offset 16, -2
+ 221 0002 1F93      		push r17
+ 222               	.LCFI1:
+ 223               		.cfi_def_cfa_offset 4
+ 224               		.cfi_offset 17, -3
+ 225 0004 CF93      		push r28
+ 226               	.LCFI2:
+ 227               		.cfi_def_cfa_offset 5
+ 228               		.cfi_offset 28, -4
+ 229               	/* prologue: function */
+ 230               	/* frame size = 0 */
+ 231               	/* stack size = 3 */
+ 232               	.L__stack_usage = 3
+ 233 0006 8C01      		movw r16,r24
+  53:quantum/process_keycode/process_rgb.c **** #ifndef SPLIT_KEYBOARD
+  54:quantum/process_keycode/process_rgb.c ****     if (record->event.pressed) {
+ 234               		.loc 1 54 5 is_stmt 1 view .LVU12
+ 235               		.loc 1 54 22 is_stmt 0 view .LVU13
+ 236 0008 FB01      		movw r30,r22
+ 237 000a C281      		ldd r28,Z+2
+ 238               		.loc 1 54 8 view .LVU14
+ 239 000c CC23      		tst r28
+ 240 000e 01F4      		brne .+2
+ 241 0010 00C0      		rjmp .L31
+ 242               	.LBB2:
+  55:quantum/process_keycode/process_rgb.c **** #else
+  56:quantum/process_keycode/process_rgb.c ****     // Split keyboards need to trigger on key-up for edge-case issue
+  57:quantum/process_keycode/process_rgb.c ****     if (!record->event.pressed) {
+  58:quantum/process_keycode/process_rgb.c **** #endif
+  59:quantum/process_keycode/process_rgb.c ****         uint8_t shifted = get_mods() & (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT));
+ 243               		.loc 1 59 9 is_stmt 1 view .LVU15
+ 244               		.loc 1 59 27 is_stmt 0 view .LVU16
+ 245 0012 0E94 0000 		call get_mods
+ 246               	.LVL3:
+ 247               		.loc 1 59 17 view .LVU17
+ 248 0016 8272      		andi r24,lo8(34)
+ 249               	.LVL4:
+  60:quantum/process_keycode/process_rgb.c ****         switch (keycode) {
+ 250               		.loc 1 60 9 is_stmt 1 view .LVU18
+ 251 0018 F801      		movw r30,r16
+ 252 001a E25C      		subi r30,-62
+ 253 001c FC45      		sbci r31,92
+ 254 001e E431      		cpi r30,20
+ 255 0020 F105      		cpc r31,__zero_reg__
+ 256 0022 00F4      		brsh .L15
+ 257 0024 E050      		subi r30,lo8(-(gs(.L18)))
+ 258 0026 F040      		sbci r31,hi8(-(gs(.L18)))
+ 259 0028 0C94 0000 		jmp __tablejump2__
+ 260               		.section	.jumptables.gcc.process_rgb,"a",@progbits
+ 261               		.p2align	1
+ 262               	.L18:
+ 263 0000 0000      		.word gs(.L30)
+ 264 0002 0000      		.word gs(.L29)
+ 265 0004 0000      		.word gs(.L28)
+ 266 0006 0000      		.word gs(.L27)
+ 267 0008 0000      		.word gs(.L26)
+ 268 000a 0000      		.word gs(.L25)
+ 269 000c 0000      		.word gs(.L24)
+ 270 000e 0000      		.word gs(.L23)
+ 271 0010 0000      		.word gs(.L22)
+ 272 0012 0000      		.word gs(.L21)
+ 273 0014 0000      		.word gs(.L20)
+ 274 0016 0000      		.word gs(.L19)
+ 275 0018 0000      		.word gs(.L32)
+ 276 001a 0000      		.word gs(.L32)
+ 277 001c 0000      		.word gs(.L32)
+ 278 001e 0000      		.word gs(.L32)
+ 279 0020 0000      		.word gs(.L32)
+ 280 0022 0000      		.word gs(.L32)
+ 281 0024 0000      		.word gs(.L32)
+ 282 0026 0000      		.word gs(.L32)
+ 283               		.section	.text.process_rgb
+ 284               	.L30:
+  61:quantum/process_keycode/process_rgb.c ****             case RGB_TOG:
+  62:quantum/process_keycode/process_rgb.c ****                 rgblight_toggle();
+ 285               		.loc 1 62 17 view .LVU19
+ 286 002c 0E94 0000 		call rgb_matrix_toggle
+ 287               	.LVL5:
+  63:quantum/process_keycode/process_rgb.c ****                 return false;
+ 288               		.loc 1 63 17 view .LVU20
+ 289               	.L32:
+  64:quantum/process_keycode/process_rgb.c ****             case RGB_MODE_FORWARD:
+  65:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGB(shifted, rgblight_step, rgblight_step_reverse);
+  66:quantum/process_keycode/process_rgb.c ****                 return false;
+  67:quantum/process_keycode/process_rgb.c ****             case RGB_MODE_REVERSE:
+  68:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGB(shifted, rgblight_step_reverse, rgblight_step);
+  69:quantum/process_keycode/process_rgb.c ****                 return false;
+  70:quantum/process_keycode/process_rgb.c ****             case RGB_HUI:
+  71:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGB(shifted, rgblight_increase_hue, rgblight_decrease_hue);
+  72:quantum/process_keycode/process_rgb.c ****                 return false;
+  73:quantum/process_keycode/process_rgb.c ****             case RGB_HUD:
+  74:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGB(shifted, rgblight_decrease_hue, rgblight_increase_hue);
+  75:quantum/process_keycode/process_rgb.c ****                 return false;
+  76:quantum/process_keycode/process_rgb.c ****             case RGB_SAI:
+  77:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGB(shifted, rgblight_increase_sat, rgblight_decrease_sat);
+  78:quantum/process_keycode/process_rgb.c ****                 return false;
+  79:quantum/process_keycode/process_rgb.c ****             case RGB_SAD:
+  80:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGB(shifted, rgblight_decrease_sat, rgblight_increase_sat);
+  81:quantum/process_keycode/process_rgb.c ****                 return false;
+  82:quantum/process_keycode/process_rgb.c ****             case RGB_VAI:
+  83:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGB(shifted, rgblight_increase_val, rgblight_decrease_val);
+  84:quantum/process_keycode/process_rgb.c ****                 return false;
+  85:quantum/process_keycode/process_rgb.c ****             case RGB_VAD:
+  86:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGB(shifted, rgblight_decrease_val, rgblight_increase_val);
+  87:quantum/process_keycode/process_rgb.c ****                 return false;
+  88:quantum/process_keycode/process_rgb.c ****             case RGB_SPI:
+  89:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGB(shifted, rgblight_increase_speed, rgblight_decrease_speed);
+  90:quantum/process_keycode/process_rgb.c ****                 return false;
+  91:quantum/process_keycode/process_rgb.c ****             case RGB_SPD:
+  92:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGB(shifted, rgblight_decrease_speed, rgblight_increase_speed);
+  93:quantum/process_keycode/process_rgb.c ****                 return false;
+  94:quantum/process_keycode/process_rgb.c ****             case RGB_MODE_PLAIN:
+  95:quantum/process_keycode/process_rgb.c ****                 rgblight_mode(RGBLIGHT_MODE_STATIC_LIGHT);
+  96:quantum/process_keycode/process_rgb.c ****                 return false;
+ 290               		.loc 1 96 17 view .LVU21
+ 291               		.loc 1 96 24 is_stmt 0 view .LVU22
+ 292 0030 C0E0      		ldi r28,0
+ 293               	.L15:
+ 294               		.loc 1 96 24 view .LVU23
+ 295               	.LBE2:
+  97:quantum/process_keycode/process_rgb.c ****             case RGB_MODE_BREATHE:
+  98:quantum/process_keycode/process_rgb.c **** #ifdef RGBLIGHT_EFFECT_BREATHING
+  99:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGBMode(RGBLIGHT_MODE_BREATHING, RGBLIGHT_MODE_BREATHING_end);
+ 100:quantum/process_keycode/process_rgb.c **** #endif
+ 101:quantum/process_keycode/process_rgb.c ****                 return false;
+ 102:quantum/process_keycode/process_rgb.c ****             case RGB_MODE_RAINBOW:
+ 103:quantum/process_keycode/process_rgb.c **** #ifdef RGBLIGHT_EFFECT_RAINBOW_MOOD
+ 104:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGBMode(RGBLIGHT_MODE_RAINBOW_MOOD, RGBLIGHT_MODE_RAINBOW_MOOD_end);
+ 105:quantum/process_keycode/process_rgb.c **** #endif
+ 106:quantum/process_keycode/process_rgb.c ****                 return false;
+ 107:quantum/process_keycode/process_rgb.c ****             case RGB_MODE_SWIRL:
+ 108:quantum/process_keycode/process_rgb.c **** #ifdef RGBLIGHT_EFFECT_RAINBOW_SWIRL
+ 109:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGBMode(RGBLIGHT_MODE_RAINBOW_SWIRL, RGBLIGHT_MODE_RAINBOW_SWIRL_end);
+ 110:quantum/process_keycode/process_rgb.c **** #endif
+ 111:quantum/process_keycode/process_rgb.c ****                 return false;
+ 112:quantum/process_keycode/process_rgb.c ****             case RGB_MODE_SNAKE:
+ 113:quantum/process_keycode/process_rgb.c **** #ifdef RGBLIGHT_EFFECT_SNAKE
+ 114:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGBMode(RGBLIGHT_MODE_SNAKE, RGBLIGHT_MODE_SNAKE_end);
+ 115:quantum/process_keycode/process_rgb.c **** #endif
+ 116:quantum/process_keycode/process_rgb.c ****                 return false;
+ 117:quantum/process_keycode/process_rgb.c ****             case RGB_MODE_KNIGHT:
+ 118:quantum/process_keycode/process_rgb.c **** #ifdef RGBLIGHT_EFFECT_KNIGHT
+ 119:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGBMode(RGBLIGHT_MODE_KNIGHT, RGBLIGHT_MODE_KNIGHT_end);
+ 120:quantum/process_keycode/process_rgb.c **** #endif
+ 121:quantum/process_keycode/process_rgb.c ****                 return false;
+ 122:quantum/process_keycode/process_rgb.c ****             case RGB_MODE_XMAS:
+ 123:quantum/process_keycode/process_rgb.c **** #ifdef RGBLIGHT_EFFECT_CHRISTMAS
+ 124:quantum/process_keycode/process_rgb.c ****                 rgblight_mode(RGBLIGHT_MODE_CHRISTMAS);
+ 125:quantum/process_keycode/process_rgb.c **** #endif
+ 126:quantum/process_keycode/process_rgb.c ****                 return false;
+ 127:quantum/process_keycode/process_rgb.c ****             case RGB_MODE_GRADIENT:
+ 128:quantum/process_keycode/process_rgb.c **** #ifdef RGBLIGHT_EFFECT_STATIC_GRADIENT
+ 129:quantum/process_keycode/process_rgb.c ****                 handleKeycodeRGBMode(RGBLIGHT_MODE_STATIC_GRADIENT, RGBLIGHT_MODE_STATIC_GRADIENT_e
+ 130:quantum/process_keycode/process_rgb.c **** #endif
+ 131:quantum/process_keycode/process_rgb.c ****                 return false;
+ 132:quantum/process_keycode/process_rgb.c ****             case RGB_MODE_RGBTEST:
+ 133:quantum/process_keycode/process_rgb.c **** #ifdef RGBLIGHT_EFFECT_RGB_TEST
+ 134:quantum/process_keycode/process_rgb.c ****                 rgblight_mode(RGBLIGHT_MODE_RGB_TEST);
+ 135:quantum/process_keycode/process_rgb.c **** #endif
+ 136:quantum/process_keycode/process_rgb.c ****                 return false;
+ 137:quantum/process_keycode/process_rgb.c ****         }
+ 138:quantum/process_keycode/process_rgb.c ****     }
+ 139:quantum/process_keycode/process_rgb.c **** 
+ 140:quantum/process_keycode/process_rgb.c ****     return true;
+ 141:quantum/process_keycode/process_rgb.c **** }
+ 296               		.loc 1 141 1 view .LVU24
+ 297 0032 8C2F      		mov r24,r28
+ 298               	/* epilogue start */
+ 299 0034 CF91      		pop r28
+ 300 0036 1F91      		pop r17
+ 301 0038 0F91      		pop r16
+ 302               	.LVL6:
+ 303               		.loc 1 141 1 view .LVU25
+ 304 003a 0895      		ret
+ 305               	.LVL7:
+ 306               	.L29:
+ 307               	.LBB3:
+  65:quantum/process_keycode/process_rgb.c ****                 return false;
+ 308               		.loc 1 65 17 is_stmt 1 view .LVU26
+ 309 003c 40E0      		ldi r20,lo8(gs(rgb_matrix_step_reverse))
+ 310 003e 50E0      		ldi r21,hi8(gs(rgb_matrix_step_reverse))
+ 311 0040 60E0      		ldi r22,lo8(gs(rgb_matrix_step))
+ 312 0042 70E0      		ldi r23,hi8(gs(rgb_matrix_step))
+ 313               	.L33:
+  92:quantum/process_keycode/process_rgb.c ****                 return false;
+ 314               		.loc 1 92 17 is_stmt 0 view .LVU27
+ 315 0044 0E94 0000 		call handleKeycodeRGB
+ 316               	.LVL8:
+  93:quantum/process_keycode/process_rgb.c ****             case RGB_MODE_PLAIN:
+ 317               		.loc 1 93 17 is_stmt 1 view .LVU28
+ 318 0048 00C0      		rjmp .L32
+ 319               	.LVL9:
+ 320               	.L28:
+  68:quantum/process_keycode/process_rgb.c ****                 return false;
+ 321               		.loc 1 68 17 view .LVU29
+ 322 004a 40E0      		ldi r20,lo8(gs(rgb_matrix_step))
+ 323 004c 50E0      		ldi r21,hi8(gs(rgb_matrix_step))
+ 324 004e 60E0      		ldi r22,lo8(gs(rgb_matrix_step_reverse))
+ 325 0050 70E0      		ldi r23,hi8(gs(rgb_matrix_step_reverse))
+ 326 0052 00C0      		rjmp .L33
+ 327               	.L27:
+  71:quantum/process_keycode/process_rgb.c ****                 return false;
+ 328               		.loc 1 71 17 view .LVU30
+ 329 0054 40E0      		ldi r20,lo8(gs(rgb_matrix_decrease_hue))
+ 330 0056 50E0      		ldi r21,hi8(gs(rgb_matrix_decrease_hue))
+ 331 0058 60E0      		ldi r22,lo8(gs(rgb_matrix_increase_hue))
+ 332 005a 70E0      		ldi r23,hi8(gs(rgb_matrix_increase_hue))
+ 333 005c 00C0      		rjmp .L33
+ 334               	.L26:
+  74:quantum/process_keycode/process_rgb.c ****                 return false;
+ 335               		.loc 1 74 17 view .LVU31
+ 336 005e 40E0      		ldi r20,lo8(gs(rgb_matrix_increase_hue))
+ 337 0060 50E0      		ldi r21,hi8(gs(rgb_matrix_increase_hue))
+ 338 0062 60E0      		ldi r22,lo8(gs(rgb_matrix_decrease_hue))
+ 339 0064 70E0      		ldi r23,hi8(gs(rgb_matrix_decrease_hue))
+ 340 0066 00C0      		rjmp .L33
+ 341               	.L25:
+  77:quantum/process_keycode/process_rgb.c ****                 return false;
+ 342               		.loc 1 77 17 view .LVU32
+ 343 0068 40E0      		ldi r20,lo8(gs(rgb_matrix_decrease_sat))
+ 344 006a 50E0      		ldi r21,hi8(gs(rgb_matrix_decrease_sat))
+ 345 006c 60E0      		ldi r22,lo8(gs(rgb_matrix_increase_sat))
+ 346 006e 70E0      		ldi r23,hi8(gs(rgb_matrix_increase_sat))
+ 347 0070 00C0      		rjmp .L33
+ 348               	.L24:
+  80:quantum/process_keycode/process_rgb.c ****                 return false;
+ 349               		.loc 1 80 17 view .LVU33
+ 350 0072 40E0      		ldi r20,lo8(gs(rgb_matrix_increase_sat))
+ 351 0074 50E0      		ldi r21,hi8(gs(rgb_matrix_increase_sat))
+ 352 0076 60E0      		ldi r22,lo8(gs(rgb_matrix_decrease_sat))
+ 353 0078 70E0      		ldi r23,hi8(gs(rgb_matrix_decrease_sat))
+ 354 007a 00C0      		rjmp .L33
+ 355               	.L23:
+  83:quantum/process_keycode/process_rgb.c ****                 return false;
+ 356               		.loc 1 83 17 view .LVU34
+ 357 007c 40E0      		ldi r20,lo8(gs(rgb_matrix_decrease_val))
+ 358 007e 50E0      		ldi r21,hi8(gs(rgb_matrix_decrease_val))
+ 359 0080 60E0      		ldi r22,lo8(gs(rgb_matrix_increase_val))
+ 360 0082 70E0      		ldi r23,hi8(gs(rgb_matrix_increase_val))
+ 361 0084 00C0      		rjmp .L33
+ 362               	.L22:
+  86:quantum/process_keycode/process_rgb.c ****                 return false;
+ 363               		.loc 1 86 17 view .LVU35
+ 364 0086 40E0      		ldi r20,lo8(gs(rgb_matrix_increase_val))
+ 365 0088 50E0      		ldi r21,hi8(gs(rgb_matrix_increase_val))
+ 366 008a 60E0      		ldi r22,lo8(gs(rgb_matrix_decrease_val))
+ 367 008c 70E0      		ldi r23,hi8(gs(rgb_matrix_decrease_val))
+ 368 008e 00C0      		rjmp .L33
+ 369               	.L21:
+  89:quantum/process_keycode/process_rgb.c ****                 return false;
+ 370               		.loc 1 89 17 view .LVU36
+ 371 0090 40E0      		ldi r20,lo8(gs(rgb_matrix_decrease_speed))
+ 372 0092 50E0      		ldi r21,hi8(gs(rgb_matrix_decrease_speed))
+ 373 0094 60E0      		ldi r22,lo8(gs(rgb_matrix_increase_speed))
+ 374 0096 70E0      		ldi r23,hi8(gs(rgb_matrix_increase_speed))
+ 375 0098 00C0      		rjmp .L33
+ 376               	.L20:
+  92:quantum/process_keycode/process_rgb.c ****                 return false;
+ 377               		.loc 1 92 17 view .LVU37
+ 378 009a 40E0      		ldi r20,lo8(gs(rgb_matrix_increase_speed))
+ 379 009c 50E0      		ldi r21,hi8(gs(rgb_matrix_increase_speed))
+ 380 009e 60E0      		ldi r22,lo8(gs(rgb_matrix_decrease_speed))
+ 381 00a0 70E0      		ldi r23,hi8(gs(rgb_matrix_decrease_speed))
+ 382 00a2 00C0      		rjmp .L33
+ 383               	.L19:
+  95:quantum/process_keycode/process_rgb.c ****                 return false;
+ 384               		.loc 1 95 17 view .LVU38
+ 385 00a4 81E0      		ldi r24,lo8(1)
+ 386               	.LVL10:
+  95:quantum/process_keycode/process_rgb.c ****                 return false;
+ 387               		.loc 1 95 17 is_stmt 0 view .LVU39
+ 388 00a6 0E94 0000 		call rgb_matrix_mode
+ 389               	.LVL11:
+ 390 00aa 00C0      		rjmp .L32
+ 391               	.LVL12:
+ 392               	.L31:
+  95:quantum/process_keycode/process_rgb.c ****                 return false;
+ 393               		.loc 1 95 17 view .LVU40
+ 394               	.LBE3:
+ 140:quantum/process_keycode/process_rgb.c **** }
+ 395               		.loc 1 140 12 view .LVU41
+ 396 00ac C1E0      		ldi r28,lo8(1)
+ 397 00ae 00C0      		rjmp .L15
+ 398               		.cfi_endproc
+ 399               	.LFE127:
+ 401               		.text
+ 402               	.Letext0:
+ 403               		.file 3 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+ 404               		.file 4 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+ 405               		.file 5 "tmk_core/common/keyboard.h"
+ 406               		.file 6 "tmk_core/common/action.h"
+ 407               		.file 7 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../StdRequestType.h"
+ 408               		.file 8 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../DeviceStandardReq.h"
+ 409               		.file 9 "lib/lufa/LUFA/Drivers/USB/Core/USBTask.h"
+ 410               		.file 10 "lib/lufa/LUFA/Drivers/USB/Core/HostStandardReq.h"
+ 411               		.file 11 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchai
+ 412               		.file 12 "tmk_core/common/report.h"
+ 413               		.file 13 "tmk_core/common/host.h"
+ 414               		.file 14 "tmk_core/common/debug.h"
+ 415               		.file 15 "quantum/keycode_config.h"
+ 416               		.file 16 "tmk_core/common/keycode.h"
+ 417               		.file 17 "quantum/quantum_keycodes.h"
+ 418               		.file 18 "quantum/keymap.h"
+ 419               		.file 19 "quantum/rgblight.h"
+ 420               		.file 20 "quantum/color.h"
+ 421               		.file 21 "quantum/rgb_matrix_types.h"
+ 422               		.file 22 "quantum/rgb_matrix.h"
+ 423               		.file 23 "tmk_core/common/action_layer.h"
+ 424               		.file 24 "tmk_core/common/timer.h"
+ 425               		.file 25 "tmk_core/common/action_util.h"
+ 426               		.file 26 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchai
+ 427               		.file 27 "quantum/process_keycode/process_tap_dance.h"
+ 428               		.file 28 "quantum/quantum.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 process_rgb.c
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:2      *ABS*:0000003e __SP_H__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:3      *ABS*:0000003d __SP_L__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:4      *ABS*:0000003f __SREG__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:5      *ABS*:00000000 __tmp_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:6      *ABS*:00000001 __zero_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:12     .text.handleKeycodeRGB:00000000 handleKeycodeRGB
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:41     .text.rgb_matrix_toggle:00000000 rgb_matrix_toggle
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:41     .text.rgb_matrix_toggle:00000000 rgb_matrix_toggle.localalias.0
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:61     .text.rgb_matrix_step:00000000 rgb_matrix_step
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:76     .text.rgb_matrix_step_reverse:00000000 rgb_matrix_step_reverse
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:91     .text.rgb_matrix_increase_hue:00000000 rgb_matrix_increase_hue
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:106    .text.rgb_matrix_decrease_hue:00000000 rgb_matrix_decrease_hue
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:121    .text.rgb_matrix_increase_sat:00000000 rgb_matrix_increase_sat
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:136    .text.rgb_matrix_decrease_sat:00000000 rgb_matrix_decrease_sat
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:151    .text.rgb_matrix_increase_val:00000000 rgb_matrix_increase_val
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:166    .text.rgb_matrix_decrease_val:00000000 rgb_matrix_decrease_val
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:181    .text.rgb_matrix_increase_speed:00000000 rgb_matrix_increase_speed
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:196    .text.rgb_matrix_decrease_speed:00000000 rgb_matrix_decrease_speed
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cckl08MS.s:211    .text.process_rgb:00000000 process_rgb
+
+UNDEFINED SYMBOLS
+get_mods
+__tablejump2__
+rgb_matrix_mode

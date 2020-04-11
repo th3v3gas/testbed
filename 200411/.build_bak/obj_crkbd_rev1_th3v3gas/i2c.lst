@@ -1,0 +1,695 @@
+   1               		.file	"i2c.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.i2c_delay,"ax",@progbits
+  12               	i2c_delay:
+  13               	.LFB6:
+  14               		.file 1 "keyboards/crkbd/i2c.c"
+   1:keyboards/crkbd/i2c.c **** #include <util/twi.h>
+   2:keyboards/crkbd/i2c.c **** #include <avr/io.h>
+   3:keyboards/crkbd/i2c.c **** #include <stdlib.h>
+   4:keyboards/crkbd/i2c.c **** #include <avr/interrupt.h>
+   5:keyboards/crkbd/i2c.c **** #include <util/twi.h>
+   6:keyboards/crkbd/i2c.c **** #include <stdbool.h>
+   7:keyboards/crkbd/i2c.c **** #include "i2c.h"
+   8:keyboards/crkbd/i2c.c **** 
+   9:keyboards/crkbd/i2c.c **** #ifdef USE_I2C
+  10:keyboards/crkbd/i2c.c **** 
+  11:keyboards/crkbd/i2c.c **** // Limits the amount of we wait for any one i2c transaction.
+  12:keyboards/crkbd/i2c.c **** // Since were running SCL line 100kHz (=> 10μs/bit), and each transactions is
+  13:keyboards/crkbd/i2c.c **** // 9 bits, a single transaction will take around 90μs to complete.
+  14:keyboards/crkbd/i2c.c **** //
+  15:keyboards/crkbd/i2c.c **** // (F_CPU/SCL_CLOCK)  =>  # of μC cycles to transfer a bit
+  16:keyboards/crkbd/i2c.c **** // poll loop takes at least 8 clock cycles to execute
+  17:keyboards/crkbd/i2c.c **** #define I2C_LOOP_TIMEOUT (9+1)*(F_CPU/SCL_CLOCK)/8
+  18:keyboards/crkbd/i2c.c **** 
+  19:keyboards/crkbd/i2c.c **** #define BUFFER_POS_INC() (slave_buffer_pos = (slave_buffer_pos+1)%SLAVE_BUFFER_SIZE)
+  20:keyboards/crkbd/i2c.c **** 
+  21:keyboards/crkbd/i2c.c **** volatile uint8_t i2c_slave_buffer[SLAVE_BUFFER_SIZE];
+  22:keyboards/crkbd/i2c.c **** 
+  23:keyboards/crkbd/i2c.c **** static volatile uint8_t slave_buffer_pos;
+  24:keyboards/crkbd/i2c.c **** static volatile bool slave_has_register_set = false;
+  25:keyboards/crkbd/i2c.c **** 
+  26:keyboards/crkbd/i2c.c **** // Wait for an i2c operation to finish
+  27:keyboards/crkbd/i2c.c **** inline static
+  28:keyboards/crkbd/i2c.c **** void i2c_delay(void) {
+  15               		.loc 1 28 22 view -0
+  16               		.cfi_startproc
+  17               	/* prologue: function */
+  18               	/* frame size = 0 */
+  19               	/* stack size = 0 */
+  20               	.L__stack_usage = 0
+  29:keyboards/crkbd/i2c.c ****   uint16_t lim = 0;
+  21               		.loc 1 29 3 view .LVU1
+  22               	.LVL0:
+  30:keyboards/crkbd/i2c.c ****   while(!(TWCR & (1<<TWINT)) && lim < I2C_LOOP_TIMEOUT)
+  23               		.loc 1 30 3 view .LVU2
+  24               		.loc 1 30 8 is_stmt 0 view .LVU3
+  25 0000 83E3      		ldi r24,lo8(51)
+  26 0002 90E0      		ldi r25,0
+  27               	.LVL1:
+  28               	.L3:
+  29               		.loc 1 30 11 view .LVU4
+  30 0004 2091 BC00 		lds r18,188
+  31               		.loc 1 30 8 view .LVU5
+  32 0008 27FD      		sbrc r18,7
+  33 000a 00C0      		rjmp .L1
+  34 000c 0197      		sbiw r24,1
+  35               	.LVL2:
+  36               		.loc 1 30 30 discriminator 1 view .LVU6
+  37 000e 01F4      		brne .L3
+  38               	.LVL3:
+  39               	.L1:
+  40               	/* epilogue start */
+  31:keyboards/crkbd/i2c.c ****     lim++;
+  32:keyboards/crkbd/i2c.c **** 
+  33:keyboards/crkbd/i2c.c ****   // easier way, but will wait slightly longer
+  34:keyboards/crkbd/i2c.c ****   // _delay_us(100);
+  35:keyboards/crkbd/i2c.c **** }
+  41               		.loc 1 35 1 view .LVU7
+  42 0010 0895      		ret
+  43               		.cfi_endproc
+  44               	.LFE6:
+  46               		.section	.text.i2c_master_init,"ax",@progbits
+  47               	.global	i2c_master_init
+  49               	i2c_master_init:
+  50               	.LFB7:
+  36:keyboards/crkbd/i2c.c **** 
+  37:keyboards/crkbd/i2c.c **** // Setup twi to run at 100kHz or 400kHz (see ./i2c.h SCL_CLOCK)
+  38:keyboards/crkbd/i2c.c **** void i2c_master_init(void) {
+  51               		.loc 1 38 28 is_stmt 1 view -0
+  52               		.cfi_startproc
+  53               	/* prologue: function */
+  54               	/* frame size = 0 */
+  55               	/* stack size = 0 */
+  56               	.L__stack_usage = 0
+  39:keyboards/crkbd/i2c.c ****   // no prescaler
+  40:keyboards/crkbd/i2c.c ****   TWSR = 0;
+  57               		.loc 1 40 3 view .LVU9
+  58               		.loc 1 40 8 is_stmt 0 view .LVU10
+  59 0000 1092 B900 		sts 185,__zero_reg__
+  41:keyboards/crkbd/i2c.c ****   // Set TWI clock frequency to SCL_CLOCK. Need TWBR>10.
+  42:keyboards/crkbd/i2c.c ****   // Check datasheets for more info.
+  43:keyboards/crkbd/i2c.c ****   TWBR = ((F_CPU/SCL_CLOCK)-16)/2;
+  60               		.loc 1 43 3 is_stmt 1 view .LVU11
+  61               		.loc 1 43 8 is_stmt 0 view .LVU12
+  62 0004 8CE0      		ldi r24,lo8(12)
+  63 0006 8093 B800 		sts 184,r24
+  64               	/* epilogue start */
+  44:keyboards/crkbd/i2c.c **** }
+  65               		.loc 1 44 1 view .LVU13
+  66 000a 0895      		ret
+  67               		.cfi_endproc
+  68               	.LFE7:
+  70               		.section	.text.i2c_master_start,"ax",@progbits
+  71               	.global	i2c_master_start
+  73               	i2c_master_start:
+  74               	.LVL4:
+  75               	.LFB8:
+  45:keyboards/crkbd/i2c.c **** 
+  46:keyboards/crkbd/i2c.c **** // Start a transaction with the given i2c slave address. The direction of the
+  47:keyboards/crkbd/i2c.c **** // transfer is set with I2C_READ and I2C_WRITE.
+  48:keyboards/crkbd/i2c.c **** // returns: 0 => success
+  49:keyboards/crkbd/i2c.c **** //          1 => error
+  50:keyboards/crkbd/i2c.c **** uint8_t i2c_master_start(uint8_t address) {
+  76               		.loc 1 50 43 is_stmt 1 view -0
+  77               		.cfi_startproc
+  78               		.loc 1 50 43 is_stmt 0 view .LVU15
+  79 0000 CF93      		push r28
+  80               	.LCFI0:
+  81               		.cfi_def_cfa_offset 3
+  82               		.cfi_offset 28, -2
+  83               	/* prologue: function */
+  84               	/* frame size = 0 */
+  85               	/* stack size = 1 */
+  86               	.L__stack_usage = 1
+  87 0002 C82F      		mov r28,r24
+  51:keyboards/crkbd/i2c.c ****   TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWSTA);
+  88               		.loc 1 51 3 is_stmt 1 view .LVU16
+  89               		.loc 1 51 8 is_stmt 0 view .LVU17
+  90 0004 84EA      		ldi r24,lo8(-92)
+  91               	.LVL5:
+  92               		.loc 1 51 8 view .LVU18
+  93 0006 8093 BC00 		sts 188,r24
+  52:keyboards/crkbd/i2c.c **** 
+  53:keyboards/crkbd/i2c.c ****   i2c_delay();
+  94               		.loc 1 53 3 is_stmt 1 view .LVU19
+  95 000a 0E94 0000 		call i2c_delay
+  96               	.LVL6:
+  54:keyboards/crkbd/i2c.c **** 
+  55:keyboards/crkbd/i2c.c ****   // check that we started successfully
+  56:keyboards/crkbd/i2c.c ****   if ( (TW_STATUS != TW_START) && (TW_STATUS != TW_REP_START))
+  97               		.loc 1 56 3 view .LVU20
+  98               		.loc 1 56 9 is_stmt 0 view .LVU21
+  99 000e 8091 B900 		lds r24,185
+ 100               		.loc 1 56 6 view .LVU22
+ 101 0012 887F      		andi r24,lo8(-8)
+ 102 0014 8830      		cpi r24,lo8(8)
+ 103 0016 01F0      		breq .L7
+ 104               		.loc 1 56 36 discriminator 1 view .LVU23
+ 105 0018 8091 B900 		lds r24,185
+ 106               		.loc 1 56 32 discriminator 1 view .LVU24
+ 107 001c 887F      		andi r24,lo8(-8)
+ 108 001e 8031      		cpi r24,lo8(16)
+ 109 0020 01F0      		breq .L7
+ 110               	.L9:
+  57:keyboards/crkbd/i2c.c ****     return 1;
+ 111               		.loc 1 57 12 view .LVU25
+ 112 0022 81E0      		ldi r24,lo8(1)
+ 113               	.L6:
+ 114               	/* epilogue start */
+  58:keyboards/crkbd/i2c.c **** 
+  59:keyboards/crkbd/i2c.c ****   TWDR = address;
+  60:keyboards/crkbd/i2c.c ****   TWCR = (1<<TWINT) | (1<<TWEN);
+  61:keyboards/crkbd/i2c.c **** 
+  62:keyboards/crkbd/i2c.c ****   i2c_delay();
+  63:keyboards/crkbd/i2c.c **** 
+  64:keyboards/crkbd/i2c.c ****   if ( (TW_STATUS != TW_MT_SLA_ACK) && (TW_STATUS != TW_MR_SLA_ACK) )
+  65:keyboards/crkbd/i2c.c ****     return 1; // slave did not acknowledge
+  66:keyboards/crkbd/i2c.c ****   else
+  67:keyboards/crkbd/i2c.c ****     return 0; // success
+  68:keyboards/crkbd/i2c.c **** }
+ 115               		.loc 1 68 1 view .LVU26
+ 116 0024 CF91      		pop r28
+ 117               	.LVL7:
+ 118               		.loc 1 68 1 view .LVU27
+ 119 0026 0895      		ret
+ 120               	.LVL8:
+ 121               	.L7:
+  59:keyboards/crkbd/i2c.c ****   TWCR = (1<<TWINT) | (1<<TWEN);
+ 122               		.loc 1 59 3 is_stmt 1 view .LVU28
+  59:keyboards/crkbd/i2c.c ****   TWCR = (1<<TWINT) | (1<<TWEN);
+ 123               		.loc 1 59 8 is_stmt 0 view .LVU29
+ 124 0028 C093 BB00 		sts 187,r28
+  60:keyboards/crkbd/i2c.c **** 
+ 125               		.loc 1 60 3 is_stmt 1 view .LVU30
+  60:keyboards/crkbd/i2c.c **** 
+ 126               		.loc 1 60 8 is_stmt 0 view .LVU31
+ 127 002c 84E8      		ldi r24,lo8(-124)
+ 128 002e 8093 BC00 		sts 188,r24
+  62:keyboards/crkbd/i2c.c **** 
+ 129               		.loc 1 62 3 is_stmt 1 view .LVU32
+ 130 0032 0E94 0000 		call i2c_delay
+ 131               	.LVL9:
+  64:keyboards/crkbd/i2c.c ****     return 1; // slave did not acknowledge
+ 132               		.loc 1 64 3 view .LVU33
+  64:keyboards/crkbd/i2c.c ****     return 1; // slave did not acknowledge
+ 133               		.loc 1 64 9 is_stmt 0 view .LVU34
+ 134 0036 8091 B900 		lds r24,185
+  64:keyboards/crkbd/i2c.c ****     return 1; // slave did not acknowledge
+ 135               		.loc 1 64 6 view .LVU35
+ 136 003a 887F      		andi r24,lo8(-8)
+ 137 003c 8831      		cpi r24,lo8(24)
+ 138 003e 01F0      		breq .L10
+  64:keyboards/crkbd/i2c.c ****     return 1; // slave did not acknowledge
+ 139               		.loc 1 64 41 discriminator 1 view .LVU36
+ 140 0040 8091 B900 		lds r24,185
+  64:keyboards/crkbd/i2c.c ****     return 1; // slave did not acknowledge
+ 141               		.loc 1 64 37 discriminator 1 view .LVU37
+ 142 0044 887F      		andi r24,lo8(-8)
+ 143 0046 8034      		cpi r24,lo8(64)
+ 144 0048 01F4      		brne .L9
+ 145               	.L10:
+  67:keyboards/crkbd/i2c.c **** }
+ 146               		.loc 1 67 12 view .LVU38
+ 147 004a 80E0      		ldi r24,0
+ 148 004c 00C0      		rjmp .L6
+ 149               		.cfi_endproc
+ 150               	.LFE8:
+ 152               		.section	.text.i2c_master_stop,"ax",@progbits
+ 153               	.global	i2c_master_stop
+ 155               	i2c_master_stop:
+ 156               	.LFB9:
+  69:keyboards/crkbd/i2c.c **** 
+  70:keyboards/crkbd/i2c.c **** 
+  71:keyboards/crkbd/i2c.c **** // Finish the i2c transaction.
+  72:keyboards/crkbd/i2c.c **** void i2c_master_stop(void) {
+ 157               		.loc 1 72 28 is_stmt 1 view -0
+ 158               		.cfi_startproc
+ 159               	/* prologue: function */
+ 160               	/* frame size = 0 */
+ 161               	/* stack size = 0 */
+ 162               	.L__stack_usage = 0
+  73:keyboards/crkbd/i2c.c ****   TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWSTO);
+ 163               		.loc 1 73 3 view .LVU40
+ 164               		.loc 1 73 8 is_stmt 0 view .LVU41
+ 165 0000 84E9      		ldi r24,lo8(-108)
+ 166 0002 8093 BC00 		sts 188,r24
+  74:keyboards/crkbd/i2c.c **** 
+  75:keyboards/crkbd/i2c.c ****   uint16_t lim = 0;
+ 167               		.loc 1 75 3 is_stmt 1 view .LVU42
+ 168               	.LVL10:
+  76:keyboards/crkbd/i2c.c ****   while(!(TWCR & (1<<TWSTO)) && lim < I2C_LOOP_TIMEOUT)
+ 169               		.loc 1 76 3 view .LVU43
+ 170               		.loc 1 76 8 is_stmt 0 view .LVU44
+ 171 0006 83E3      		ldi r24,lo8(51)
+ 172 0008 90E0      		ldi r25,0
+ 173               	.LVL11:
+ 174               	.L19:
+ 175               		.loc 1 76 11 view .LVU45
+ 176 000a 2091 BC00 		lds r18,188
+ 177               		.loc 1 76 8 view .LVU46
+ 178 000e 24FD      		sbrc r18,4
+ 179 0010 00C0      		rjmp .L17
+ 180 0012 0197      		sbiw r24,1
+ 181               	.LVL12:
+ 182               		.loc 1 76 30 discriminator 1 view .LVU47
+ 183 0014 01F4      		brne .L19
+ 184               	.LVL13:
+ 185               	.L17:
+ 186               	/* epilogue start */
+  77:keyboards/crkbd/i2c.c ****     lim++;
+  78:keyboards/crkbd/i2c.c **** }
+ 187               		.loc 1 78 1 view .LVU48
+ 188 0016 0895      		ret
+ 189               		.cfi_endproc
+ 190               	.LFE9:
+ 192               		.section	.text.i2c_master_write,"ax",@progbits
+ 193               	.global	i2c_master_write
+ 195               	i2c_master_write:
+ 196               	.LVL14:
+ 197               	.LFB10:
+  79:keyboards/crkbd/i2c.c **** 
+  80:keyboards/crkbd/i2c.c **** // Write one byte to the i2c slave.
+  81:keyboards/crkbd/i2c.c **** // returns 0 => slave ACK
+  82:keyboards/crkbd/i2c.c **** //         1 => slave NACK
+  83:keyboards/crkbd/i2c.c **** uint8_t i2c_master_write(uint8_t data) {
+ 198               		.loc 1 83 40 is_stmt 1 view -0
+ 199               		.cfi_startproc
+ 200               	/* prologue: function */
+ 201               	/* frame size = 0 */
+ 202               	/* stack size = 0 */
+ 203               	.L__stack_usage = 0
+  84:keyboards/crkbd/i2c.c ****   TWDR = data;
+ 204               		.loc 1 84 3 view .LVU50
+ 205               		.loc 1 84 8 is_stmt 0 view .LVU51
+ 206 0000 8093 BB00 		sts 187,r24
+  85:keyboards/crkbd/i2c.c ****   TWCR = (1<<TWINT) | (1<<TWEN);
+ 207               		.loc 1 85 3 is_stmt 1 view .LVU52
+ 208               		.loc 1 85 8 is_stmt 0 view .LVU53
+ 209 0004 84E8      		ldi r24,lo8(-124)
+ 210               	.LVL15:
+ 211               		.loc 1 85 8 view .LVU54
+ 212 0006 8093 BC00 		sts 188,r24
+ 213               	.LVL16:
+  86:keyboards/crkbd/i2c.c **** 
+  87:keyboards/crkbd/i2c.c ****   i2c_delay();
+ 214               		.loc 1 87 3 is_stmt 1 view .LVU55
+ 215 000a 0E94 0000 		call i2c_delay
+ 216               	.LVL17:
+  88:keyboards/crkbd/i2c.c **** 
+  89:keyboards/crkbd/i2c.c ****   // check if the slave acknowledged us
+  90:keyboards/crkbd/i2c.c ****   return (TW_STATUS == TW_MT_DATA_ACK) ? 0 : 1;
+ 217               		.loc 1 90 3 view .LVU56
+ 218               		.loc 1 90 11 is_stmt 0 view .LVU57
+ 219 000e 9091 B900 		lds r25,185
+ 220               		.loc 1 90 44 view .LVU58
+ 221 0012 987F      		andi r25,lo8(-8)
+ 222 0014 81E0      		ldi r24,lo8(1)
+ 223 0016 9832      		cpi r25,lo8(40)
+ 224 0018 01F4      		brne .L22
+ 225 001a 80E0      		ldi r24,0
+ 226               	.L22:
+ 227               	/* epilogue start */
+  91:keyboards/crkbd/i2c.c **** }
+ 228               		.loc 1 91 1 view .LVU59
+ 229 001c 0895      		ret
+ 230               		.cfi_endproc
+ 231               	.LFE10:
+ 233               		.section	.text.i2c_master_read,"ax",@progbits
+ 234               	.global	i2c_master_read
+ 236               	i2c_master_read:
+ 237               	.LVL18:
+ 238               	.LFB11:
+  92:keyboards/crkbd/i2c.c **** 
+  93:keyboards/crkbd/i2c.c **** // Read one byte from the i2c slave. If ack=1 the slave is acknowledged,
+  94:keyboards/crkbd/i2c.c **** // if ack=0 the acknowledge bit is not set.
+  95:keyboards/crkbd/i2c.c **** // returns: byte read from i2c device
+  96:keyboards/crkbd/i2c.c **** uint8_t i2c_master_read(int ack) {
+ 239               		.loc 1 96 34 is_stmt 1 view -0
+ 240               		.cfi_startproc
+ 241               	/* prologue: function */
+ 242               	/* frame size = 0 */
+ 243               	/* stack size = 0 */
+ 244               	.L__stack_usage = 0
+  97:keyboards/crkbd/i2c.c ****   TWCR = (1<<TWINT) | (1<<TWEN) | (ack<<TWEA);
+ 245               		.loc 1 97 3 view .LVU61
+ 246               		.loc 1 97 39 is_stmt 0 view .LVU62
+ 247 0000 26E0      		ldi r18,6
+ 248               		1:
+ 249 0002 880F      		lsl r24
+ 250 0004 991F      		rol r25
+ 251 0006 2A95      		dec r18
+ 252 0008 01F4      		brne 1b
+ 253               	.LVL19:
+ 254               		.loc 1 97 33 view .LVU63
+ 255 000a 8468      		ori r24,lo8(-124)
+ 256               		.loc 1 97 8 view .LVU64
+ 257 000c 8093 BC00 		sts 188,r24
+  98:keyboards/crkbd/i2c.c **** 
+  99:keyboards/crkbd/i2c.c ****   i2c_delay();
+ 258               		.loc 1 99 3 is_stmt 1 view .LVU65
+ 259 0010 0E94 0000 		call i2c_delay
+ 260               	.LVL20:
+ 100:keyboards/crkbd/i2c.c ****   return TWDR;
+ 261               		.loc 1 100 3 view .LVU66
+ 262               		.loc 1 100 10 is_stmt 0 view .LVU67
+ 263 0014 8091 BB00 		lds r24,187
+ 264               	/* epilogue start */
+ 101:keyboards/crkbd/i2c.c **** }
+ 265               		.loc 1 101 1 view .LVU68
+ 266 0018 0895      		ret
+ 267               		.cfi_endproc
+ 268               	.LFE11:
+ 270               		.section	.text.i2c_reset_state,"ax",@progbits
+ 271               	.global	i2c_reset_state
+ 273               	i2c_reset_state:
+ 274               	.LFB12:
+ 102:keyboards/crkbd/i2c.c **** 
+ 103:keyboards/crkbd/i2c.c **** void i2c_reset_state(void) {
+ 275               		.loc 1 103 28 is_stmt 1 view -0
+ 276               		.cfi_startproc
+ 277               	/* prologue: function */
+ 278               	/* frame size = 0 */
+ 279               	/* stack size = 0 */
+ 280               	.L__stack_usage = 0
+ 104:keyboards/crkbd/i2c.c ****   TWCR = 0;
+ 281               		.loc 1 104 3 view .LVU70
+ 282               		.loc 1 104 8 is_stmt 0 view .LVU71
+ 283 0000 1092 BC00 		sts 188,__zero_reg__
+ 284               	/* epilogue start */
+ 105:keyboards/crkbd/i2c.c **** }
+ 285               		.loc 1 105 1 view .LVU72
+ 286 0004 0895      		ret
+ 287               		.cfi_endproc
+ 288               	.LFE12:
+ 290               		.section	.text.i2c_slave_init,"ax",@progbits
+ 291               	.global	i2c_slave_init
+ 293               	i2c_slave_init:
+ 294               	.LVL21:
+ 295               	.LFB13:
+ 106:keyboards/crkbd/i2c.c **** 
+ 107:keyboards/crkbd/i2c.c **** void i2c_slave_init(uint8_t address) {
+ 296               		.loc 1 107 38 is_stmt 1 view -0
+ 297               		.cfi_startproc
+ 298               	/* prologue: function */
+ 299               	/* frame size = 0 */
+ 300               	/* stack size = 0 */
+ 301               	.L__stack_usage = 0
+ 108:keyboards/crkbd/i2c.c ****   TWAR = address << 0; // slave i2c address
+ 302               		.loc 1 108 3 view .LVU74
+ 303               		.loc 1 108 8 is_stmt 0 view .LVU75
+ 304 0000 8093 BA00 		sts 186,r24
+ 109:keyboards/crkbd/i2c.c ****   // TWEN  - twi enable
+ 110:keyboards/crkbd/i2c.c ****   // TWEA  - enable address acknowledgement
+ 111:keyboards/crkbd/i2c.c ****   // TWINT - twi interrupt flag
+ 112:keyboards/crkbd/i2c.c ****   // TWIE  - enable the twi interrupt
+ 113:keyboards/crkbd/i2c.c ****   TWCR = (1<<TWIE) | (1<<TWEA) | (1<<TWINT) | (1<<TWEN);
+ 305               		.loc 1 113 3 is_stmt 1 view .LVU76
+ 306               		.loc 1 113 8 is_stmt 0 view .LVU77
+ 307 0004 85EC      		ldi r24,lo8(-59)
+ 308               	.LVL22:
+ 309               		.loc 1 113 8 view .LVU78
+ 310 0006 8093 BC00 		sts 188,r24
+ 311               	.LVL23:
+ 312               	/* epilogue start */
+ 114:keyboards/crkbd/i2c.c **** }
+ 313               		.loc 1 114 1 view .LVU79
+ 314 000a 0895      		ret
+ 315               		.cfi_endproc
+ 316               	.LFE13:
+ 318               		.section	.text.__vector_36,"ax",@progbits
+ 319               	.global	__vector_36
+ 321               	__vector_36:
+ 322               	.LFB14:
+ 115:keyboards/crkbd/i2c.c **** 
+ 116:keyboards/crkbd/i2c.c **** ISR(TWI_vect);
+ 117:keyboards/crkbd/i2c.c **** 
+ 118:keyboards/crkbd/i2c.c **** ISR(TWI_vect) {
+ 323               		.loc 1 118 15 is_stmt 1 view -0
+ 324               		.cfi_startproc
+ 325 0000 1F92 1FB6 		__gcc_isr 1
+ 325      1F92 1124 
+ 325      8F93 
+ 326 000a 9F93      		push r25
+ 327               	.LCFI1:
+ 328               		.cfi_def_cfa_offset 3
+ 329               		.cfi_offset 25, -2
+ 330 000c EF93      		push r30
+ 331               	.LCFI2:
+ 332               		.cfi_def_cfa_offset 4
+ 333               		.cfi_offset 30, -3
+ 334 000e FF93      		push r31
+ 335               	.LCFI3:
+ 336               		.cfi_def_cfa_offset 5
+ 337               		.cfi_offset 31, -4
+ 338               	/* prologue: Signal */
+ 339               	/* frame size = 0 */
+ 340               	/* stack size = 3...7 */
+ 341               	.L__stack_usage = 3 + __gcc_isr.n_pushed
+ 119:keyboards/crkbd/i2c.c ****   uint8_t ack = 1;
+ 342               		.loc 1 119 3 view .LVU81
+ 343               	.LVL24:
+ 120:keyboards/crkbd/i2c.c ****   switch(TW_STATUS) {
+ 344               		.loc 1 120 3 view .LVU82
+ 345               		.loc 1 120 10 is_stmt 0 view .LVU83
+ 346 0010 8091 B900 		lds r24,185
+ 347 0014 887F      		andi r24,lo8(-8)
+ 348               		.loc 1 120 3 view .LVU84
+ 349 0016 8038      		cpi r24,lo8(-128)
+ 350 0018 01F0      		breq .L27
+ 351 001a 00F4      		brsh .L28
+ 352 001c 8823      		tst r24
+ 353 001e 01F4      		brne .+2
+ 354 0020 00C0      		rjmp .L29
+ 355 0022 8036      		cpi r24,lo8(96)
+ 356 0024 01F0      		breq .L30
+ 357               	.L42:
+ 119:keyboards/crkbd/i2c.c ****   uint8_t ack = 1;
+ 358               		.loc 1 119 11 view .LVU85
+ 359 0026 81E0      		ldi r24,lo8(1)
+ 360 0028 00C0      		rjmp .L31
+ 361               	.L28:
+ 362               		.loc 1 120 3 view .LVU86
+ 363 002a 883A      		cpi r24,lo8(-88)
+ 364 002c 01F0      		breq .L32
+ 365 002e 883B      		cpi r24,lo8(-72)
+ 366 0030 01F4      		brne .L42
+ 367               	.L32:
+ 121:keyboards/crkbd/i2c.c ****     case TW_SR_SLA_ACK:
+ 122:keyboards/crkbd/i2c.c ****       // this device has been addressed as a slave receiver
+ 123:keyboards/crkbd/i2c.c ****       slave_has_register_set = false;
+ 124:keyboards/crkbd/i2c.c ****       break;
+ 125:keyboards/crkbd/i2c.c **** 
+ 126:keyboards/crkbd/i2c.c ****     case TW_SR_DATA_ACK:
+ 127:keyboards/crkbd/i2c.c ****       // this device has received data as a slave receiver
+ 128:keyboards/crkbd/i2c.c ****       // The first byte that we receive in this transaction sets the location
+ 129:keyboards/crkbd/i2c.c ****       // of the read/write location of the slaves memory that it exposes over
+ 130:keyboards/crkbd/i2c.c ****       // i2c.  After that, bytes will be written at slave_buffer_pos, incrementing
+ 131:keyboards/crkbd/i2c.c ****       // slave_buffer_pos after each write.
+ 132:keyboards/crkbd/i2c.c ****       if(!slave_has_register_set) {
+ 133:keyboards/crkbd/i2c.c ****         slave_buffer_pos = TWDR;
+ 134:keyboards/crkbd/i2c.c ****         // don't acknowledge the master if this memory loctaion is out of bounds
+ 135:keyboards/crkbd/i2c.c ****         if ( slave_buffer_pos >= SLAVE_BUFFER_SIZE ) {
+ 136:keyboards/crkbd/i2c.c ****           ack = 0;
+ 137:keyboards/crkbd/i2c.c ****           slave_buffer_pos = 0;
+ 138:keyboards/crkbd/i2c.c ****         }
+ 139:keyboards/crkbd/i2c.c ****         slave_has_register_set = true;
+ 140:keyboards/crkbd/i2c.c ****       } else {
+ 141:keyboards/crkbd/i2c.c ****         i2c_slave_buffer[slave_buffer_pos] = TWDR;
+ 142:keyboards/crkbd/i2c.c ****         BUFFER_POS_INC();
+ 143:keyboards/crkbd/i2c.c ****       }
+ 144:keyboards/crkbd/i2c.c ****       break;
+ 145:keyboards/crkbd/i2c.c **** 
+ 146:keyboards/crkbd/i2c.c ****     case TW_ST_SLA_ACK:
+ 147:keyboards/crkbd/i2c.c ****     case TW_ST_DATA_ACK:
+ 148:keyboards/crkbd/i2c.c ****       // master has addressed this device as a slave transmitter and is
+ 149:keyboards/crkbd/i2c.c ****       // requesting data.
+ 150:keyboards/crkbd/i2c.c ****       TWDR = i2c_slave_buffer[slave_buffer_pos];
+ 368               		.loc 1 150 7 is_stmt 1 view .LVU87
+ 369               		.loc 1 150 30 is_stmt 0 view .LVU88
+ 370 0032 E091 0000 		lds r30,slave_buffer_pos
+ 371 0036 F0E0      		ldi r31,0
+ 372 0038 E050      		subi r30,lo8(-(i2c_slave_buffer))
+ 373 003a F040      		sbci r31,hi8(-(i2c_slave_buffer))
+ 374 003c 8081      		ld r24,Z
+ 375               		.loc 1 150 12 view .LVU89
+ 376 003e 8093 BB00 		sts 187,r24
+ 377 0042 00C0      		rjmp .L43
+ 378               	.L30:
+ 123:keyboards/crkbd/i2c.c ****       break;
+ 379               		.loc 1 123 7 is_stmt 1 view .LVU90
+ 123:keyboards/crkbd/i2c.c ****       break;
+ 380               		.loc 1 123 30 is_stmt 0 view .LVU91
+ 381 0044 1092 0000 		sts slave_has_register_set,__zero_reg__
+ 124:keyboards/crkbd/i2c.c **** 
+ 382               		.loc 1 124 7 is_stmt 1 view .LVU92
+ 383 0048 00C0      		rjmp .L42
+ 384               	.L27:
+ 132:keyboards/crkbd/i2c.c ****         slave_buffer_pos = TWDR;
+ 385               		.loc 1 132 7 view .LVU93
+ 132:keyboards/crkbd/i2c.c ****         slave_buffer_pos = TWDR;
+ 386               		.loc 1 132 10 is_stmt 0 view .LVU94
+ 387 004a 8091 0000 		lds r24,slave_has_register_set
+ 132:keyboards/crkbd/i2c.c ****         slave_buffer_pos = TWDR;
+ 388               		.loc 1 132 9 view .LVU95
+ 389 004e 8111      		cpse r24,__zero_reg__
+ 390 0050 00C0      		rjmp .L33
+ 133:keyboards/crkbd/i2c.c ****         // don't acknowledge the master if this memory loctaion is out of bounds
+ 391               		.loc 1 133 9 is_stmt 1 view .LVU96
+ 133:keyboards/crkbd/i2c.c ****         // don't acknowledge the master if this memory loctaion is out of bounds
+ 392               		.loc 1 133 28 is_stmt 0 view .LVU97
+ 393 0052 8091 BB00 		lds r24,187
+ 133:keyboards/crkbd/i2c.c ****         // don't acknowledge the master if this memory loctaion is out of bounds
+ 394               		.loc 1 133 26 view .LVU98
+ 395 0056 8093 0000 		sts slave_buffer_pos,r24
+ 135:keyboards/crkbd/i2c.c ****           ack = 0;
+ 396               		.loc 1 135 9 is_stmt 1 view .LVU99
+ 135:keyboards/crkbd/i2c.c ****           ack = 0;
+ 397               		.loc 1 135 31 is_stmt 0 view .LVU100
+ 398 005a 8091 0000 		lds r24,slave_buffer_pos
+ 135:keyboards/crkbd/i2c.c ****           ack = 0;
+ 399               		.loc 1 135 12 view .LVU101
+ 400 005e 8031      		cpi r24,lo8(16)
+ 401 0060 00F0      		brlo .L35
+ 136:keyboards/crkbd/i2c.c ****           slave_buffer_pos = 0;
+ 402               		.loc 1 136 11 is_stmt 1 view .LVU102
+ 403               	.LVL25:
+ 137:keyboards/crkbd/i2c.c ****         }
+ 404               		.loc 1 137 11 view .LVU103
+ 137:keyboards/crkbd/i2c.c ****         }
+ 405               		.loc 1 137 28 is_stmt 0 view .LVU104
+ 406 0062 1092 0000 		sts slave_buffer_pos,__zero_reg__
+ 136:keyboards/crkbd/i2c.c ****           slave_buffer_pos = 0;
+ 407               		.loc 1 136 15 view .LVU105
+ 408 0066 80E0      		ldi r24,0
+ 409               	.LVL26:
+ 410               	.L34:
+ 139:keyboards/crkbd/i2c.c ****       } else {
+ 411               		.loc 1 139 9 is_stmt 1 view .LVU106
+ 139:keyboards/crkbd/i2c.c ****       } else {
+ 412               		.loc 1 139 32 is_stmt 0 view .LVU107
+ 413 0068 91E0      		ldi r25,lo8(1)
+ 414 006a 9093 0000 		sts slave_has_register_set,r25
+ 415               	.LVL27:
+ 416               	.L31:
+ 151:keyboards/crkbd/i2c.c ****       BUFFER_POS_INC();
+ 152:keyboards/crkbd/i2c.c ****       break;
+ 153:keyboards/crkbd/i2c.c **** 
+ 154:keyboards/crkbd/i2c.c ****     case TW_BUS_ERROR: // something went wrong, reset twi state
+ 155:keyboards/crkbd/i2c.c ****       TWCR = 0;
+ 156:keyboards/crkbd/i2c.c ****     default:
+ 157:keyboards/crkbd/i2c.c ****       break;
+ 158:keyboards/crkbd/i2c.c ****   }
+ 159:keyboards/crkbd/i2c.c ****   // Reset everything, so we are ready for the next TWI interrupt
+ 160:keyboards/crkbd/i2c.c ****   TWCR |= (1<<TWIE) | (1<<TWINT) | (ack<<TWEA) | (1<<TWEN);
+ 417               		.loc 1 160 3 is_stmt 1 view .LVU108
+ 418               		.loc 1 160 8 is_stmt 0 view .LVU109
+ 419 006e 9091 BC00 		lds r25,188
+ 420               		.loc 1 160 40 view .LVU110
+ 421 0072 8295      		swap r24
+ 422               	.LVL28:
+ 423               		.loc 1 160 40 view .LVU111
+ 424 0074 880F      		lsl r24
+ 425 0076 880F      		lsl r24
+ 426 0078 807C      		andi r24,lo8(-64)
+ 427               		.loc 1 160 8 view .LVU112
+ 428 007a 892B      		or r24,r25
+ 429 007c 8568      		ori r24,lo8(-123)
+ 430 007e 8093 BC00 		sts 188,r24
+ 431               	/* epilogue start */
+ 161:keyboards/crkbd/i2c.c **** }
+ 432               		.loc 1 161 1 view .LVU113
+ 433 0082 FF91      		pop r31
+ 434 0084 EF91      		pop r30
+ 435 0086 9F91      		pop r25
+ 436 0088 8F91 1F90 		__gcc_isr 2
+ 436      1FBE 1F90 
+ 437 0090 1895      		reti
+ 438               	.LVL29:
+ 439               	.L35:
+ 119:keyboards/crkbd/i2c.c ****   switch(TW_STATUS) {
+ 440               		.loc 1 119 11 view .LVU114
+ 441 0092 81E0      		ldi r24,lo8(1)
+ 442 0094 00C0      		rjmp .L34
+ 443               	.L33:
+ 141:keyboards/crkbd/i2c.c ****         BUFFER_POS_INC();
+ 444               		.loc 1 141 9 is_stmt 1 view .LVU115
+ 141:keyboards/crkbd/i2c.c ****         BUFFER_POS_INC();
+ 445               		.loc 1 141 25 is_stmt 0 view .LVU116
+ 446 0096 E091 0000 		lds r30,slave_buffer_pos
+ 447 009a F0E0      		ldi r31,0
+ 141:keyboards/crkbd/i2c.c ****         BUFFER_POS_INC();
+ 448               		.loc 1 141 46 view .LVU117
+ 449 009c 8091 BB00 		lds r24,187
+ 141:keyboards/crkbd/i2c.c ****         BUFFER_POS_INC();
+ 450               		.loc 1 141 44 view .LVU118
+ 451 00a0 E050      		subi r30,lo8(-(i2c_slave_buffer))
+ 452 00a2 F040      		sbci r31,hi8(-(i2c_slave_buffer))
+ 453 00a4 8083      		st Z,r24
+ 142:keyboards/crkbd/i2c.c ****       }
+ 454               		.loc 1 142 9 is_stmt 1 view .LVU119
+ 455               	.L43:
+ 151:keyboards/crkbd/i2c.c ****       break;
+ 456               		.loc 1 151 7 view .LVU120
+ 457 00a6 8091 0000 		lds r24,slave_buffer_pos
+ 458 00aa 90E0      		ldi r25,0
+ 459 00ac 0196      		adiw r24,1
+ 460 00ae 8F70      		andi r24,15
+ 461 00b0 9927      		clr r25
+ 462 00b2 8093 0000 		sts slave_buffer_pos,r24
+ 152:keyboards/crkbd/i2c.c **** 
+ 463               		.loc 1 152 7 view .LVU121
+ 464 00b6 00C0      		rjmp .L42
+ 465               	.L29:
+ 155:keyboards/crkbd/i2c.c ****     default:
+ 466               		.loc 1 155 7 view .LVU122
+ 155:keyboards/crkbd/i2c.c ****     default:
+ 467               		.loc 1 155 12 is_stmt 0 view .LVU123
+ 468 00b8 1092 BC00 		sts 188,__zero_reg__
+ 469 00bc 00C0      		rjmp .L42
+ 470               		__gcc_isr 0,r24
+ 471               		.cfi_endproc
+ 472               	.LFE14:
+ 474               		.section	.bss.slave_has_register_set,"aw",@nobits
+ 477               	slave_has_register_set:
+ 478 0000 00        		.zero	1
+ 479               		.section	.bss.slave_buffer_pos,"aw",@nobits
+ 482               	slave_buffer_pos:
+ 483 0000 00        		.zero	1
+ 484               		.comm	i2c_slave_buffer,16,1
+ 485               		.text
+ 486               	.Letext0:
+ 487               		.file 2 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+ 488               		.file 3 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+ 489               		.file 4 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+ 490               		.file 5 "keyboards/crkbd/i2c.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 i2c.c
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:2      *ABS*:0000003e __SP_H__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:3      *ABS*:0000003d __SP_L__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:4      *ABS*:0000003f __SREG__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:5      *ABS*:00000000 __tmp_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:6      *ABS*:00000001 __zero_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:12     .text.i2c_delay:00000000 i2c_delay
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:49     .text.i2c_master_init:00000000 i2c_master_init
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:73     .text.i2c_master_start:00000000 i2c_master_start
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:155    .text.i2c_master_stop:00000000 i2c_master_stop
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:195    .text.i2c_master_write:00000000 i2c_master_write
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:236    .text.i2c_master_read:00000000 i2c_master_read
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:273    .text.i2c_reset_state:00000000 i2c_reset_state
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:293    .text.i2c_slave_init:00000000 i2c_slave_init
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:321    .text.__vector_36:00000000 __vector_36
+                            *ABS*:00000003 __gcc_isr.n_pushed.001
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:482    .bss.slave_buffer_pos:00000000 slave_buffer_pos
+                            *COM*:00000010 i2c_slave_buffer
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccHtSaE2.s:477    .bss.slave_has_register_set:00000000 slave_has_register_set
+
+UNDEFINED SYMBOLS
+__do_clear_bss

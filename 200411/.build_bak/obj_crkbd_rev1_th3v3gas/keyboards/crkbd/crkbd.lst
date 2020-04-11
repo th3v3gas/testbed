@@ -1,0 +1,71 @@
+   1               		.file	"crkbd.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.process_record_kb,"ax",@progbits
+  11               	.global	process_record_kb
+  13               	process_record_kb:
+  14               	.LVL0:
+  15               	.LFB119:
+  16               		.file 1 "keyboards/crkbd/crkbd.c"
+   1:keyboards/crkbd/crkbd.c **** #include "crkbd.h"
+   2:keyboards/crkbd/crkbd.c **** 
+   3:keyboards/crkbd/crkbd.c **** bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
+  17               		.loc 1 3 63 view -0
+  18               		.cfi_startproc
+  19               	/* prologue: function */
+  20               	/* frame size = 0 */
+  21               	/* stack size = 0 */
+  22               	.L__stack_usage = 0
+   4:keyboards/crkbd/crkbd.c **** #ifdef SSD1306OLED
+   5:keyboards/crkbd/crkbd.c ****   return process_record_gfx(keycode,record) && process_record_user(keycode, record);
+   6:keyboards/crkbd/crkbd.c **** #else
+   7:keyboards/crkbd/crkbd.c ****   return process_record_user(keycode, record);
+  23               		.loc 1 7 3 view .LVU1
+  24               		.loc 1 7 10 is_stmt 0 view .LVU2
+  25 0000 0C94 0000 		jmp process_record_user
+  26               	.LVL1:
+  27               		.loc 1 7 10 view .LVU3
+  28               		.cfi_endproc
+  29               	.LFE119:
+  31               		.text
+  32               	.Letext0:
+  33               		.file 2 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+  34               		.file 3 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+  35               		.file 4 "tmk_core/common/keyboard.h"
+  36               		.file 5 "tmk_core/common/action.h"
+  37               		.file 6 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../StdRequestType.h"
+  38               		.file 7 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../DeviceStandardReq.h"
+  39               		.file 8 "lib/lufa/LUFA/Drivers/USB/Core/USBTask.h"
+  40               		.file 9 "lib/lufa/LUFA/Drivers/USB/Core/HostStandardReq.h"
+  41               		.file 10 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchai
+  42               		.file 11 "tmk_core/common/report.h"
+  43               		.file 12 "tmk_core/common/host_driver.h"
+  44               		.file 13 "tmk_core/common/host.h"
+  45               		.file 14 "tmk_core/common/debug.h"
+  46               		.file 15 "quantum/keycode_config.h"
+  47               		.file 16 "quantum/keymap.h"
+  48               		.file 17 "tmk_core/common/action_layer.h"
+  49               		.file 18 "tmk_core/common/timer.h"
+  50               		.file 19 "tmk_core/common/action_util.h"
+  51               		.file 20 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchai
+  52               		.file 21 "quantum/process_keycode/process_tap_dance.h"
+  53               		.file 22 "quantum/quantum.h"
+  54               		.file 23 "tmk_core/protocol/lufa/lufa.h"
+  55               		.file 24 "keyboards/crkbd/rev1/split_util.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 crkbd.c
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccMyaAvS.s:2      *ABS*:0000003e __SP_H__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccMyaAvS.s:3      *ABS*:0000003d __SP_L__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccMyaAvS.s:4      *ABS*:0000003f __SREG__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccMyaAvS.s:5      *ABS*:00000000 __tmp_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccMyaAvS.s:6      *ABS*:00000001 __zero_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccMyaAvS.s:13     .text.process_record_kb:00000000 process_record_kb
+
+UNDEFINED SYMBOLS
+process_record_user

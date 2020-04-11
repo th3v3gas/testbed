@@ -1,0 +1,184 @@
+   1               		.file	"rev1.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.matrix_init_user,"ax",@progbits
+  11               		.weak	matrix_init_user
+  13               	matrix_init_user:
+  14               	.LFB119:
+  15               		.file 1 "keyboards/crkbd/rev1/rev1.c"
+   1:keyboards/crkbd/rev1/rev1.c **** #include "crkbd.h"
+   2:keyboards/crkbd/rev1/rev1.c **** 
+   3:keyboards/crkbd/rev1/rev1.c **** #ifdef RGB_MATRIX_ENABLE
+   4:keyboards/crkbd/rev1/rev1.c **** 
+   5:keyboards/crkbd/rev1/rev1.c ****   // Logical Layout
+   6:keyboards/crkbd/rev1/rev1.c ****   // Columns
+   7:keyboards/crkbd/rev1/rev1.c ****   // Left
+   8:keyboards/crkbd/rev1/rev1.c ****   // 0  1  2  3  4  5
+   9:keyboards/crkbd/rev1/rev1.c ****   //                   ROWS
+  10:keyboards/crkbd/rev1/rev1.c ****   // 25 24 19 18 11 10   0
+  11:keyboards/crkbd/rev1/rev1.c ****   //    03    02    01
+  12:keyboards/crkbd/rev1/rev1.c ****   // 26 23 20 17 12 09   1
+  13:keyboards/crkbd/rev1/rev1.c ****   //    04    05    06
+  14:keyboards/crkbd/rev1/rev1.c ****   // 27 22 21 16 13 08   2
+  15:keyboards/crkbd/rev1/rev1.c ****   //
+  16:keyboards/crkbd/rev1/rev1.c ****   //          15 14 07   3
+  17:keyboards/crkbd/rev1/rev1.c ****   //
+  18:keyboards/crkbd/rev1/rev1.c ****   // Right
+  19:keyboards/crkbd/rev1/rev1.c ****   // 0  1  2  3  4  5
+  20:keyboards/crkbd/rev1/rev1.c ****   //                    ROWS
+  21:keyboards/crkbd/rev1/rev1.c ****   // 25 24 19 18 11 10   4
+  22:keyboards/crkbd/rev1/rev1.c ****   //    03    02    01
+  23:keyboards/crkbd/rev1/rev1.c ****   // 26 23 20 17 12 09   5
+  24:keyboards/crkbd/rev1/rev1.c ****   //    04    05    06
+  25:keyboards/crkbd/rev1/rev1.c ****   // 27 22 21 16 13 08   6
+  26:keyboards/crkbd/rev1/rev1.c ****   //
+  27:keyboards/crkbd/rev1/rev1.c ****   //          15 14 07   7
+  28:keyboards/crkbd/rev1/rev1.c ****   //
+  29:keyboards/crkbd/rev1/rev1.c ****   // Physical Layout
+  30:keyboards/crkbd/rev1/rev1.c ****   // Columns
+  31:keyboards/crkbd/rev1/rev1.c ****   // 0  1  2  3  4  5  6  7  8  9  10 11 12 13
+  32:keyboards/crkbd/rev1/rev1.c ****   //                                           ROWS
+  33:keyboards/crkbd/rev1/rev1.c ****   // 25 24 19 18 11 10       10 11 18 19 24 25  0
+  34:keyboards/crkbd/rev1/rev1.c ****   //    03    02    01       01    02    03
+  35:keyboards/crkbd/rev1/rev1.c ****   // 26 23 20 17 12 09       09 12 17 20 23 26  1
+  36:keyboards/crkbd/rev1/rev1.c ****   //    04                               04
+  37:keyboards/crkbd/rev1/rev1.c ****   // 27 22 21 16 13 08       08 13 16 21 22 27  2
+  38:keyboards/crkbd/rev1/rev1.c ****   //          05    06       06    05
+  39:keyboards/crkbd/rev1/rev1.c ****   //           15 14 07     07 14 15              3
+  40:keyboards/crkbd/rev1/rev1.c **** 
+  41:keyboards/crkbd/rev1/rev1.c **** led_config_t g_led_config = { {
+  42:keyboards/crkbd/rev1/rev1.c ****     {  24,  23,  18,  17,  10,   9 },
+  43:keyboards/crkbd/rev1/rev1.c ****     {  25,  22,  19,  16,  11,   8 },
+  44:keyboards/crkbd/rev1/rev1.c ****     {  26,  21,  20,  15,  12,   7 },
+  45:keyboards/crkbd/rev1/rev1.c ****     { NO_LED, NO_LED, NO_LED,  14,  13,   6 },
+  46:keyboards/crkbd/rev1/rev1.c ****     {  51,  50,  45,  44,  37,  36 },
+  47:keyboards/crkbd/rev1/rev1.c ****     {  52,  49,  46,  43,  38,  35 },
+  48:keyboards/crkbd/rev1/rev1.c ****     {  53,  48,  47,  42,  39,  34 },
+  49:keyboards/crkbd/rev1/rev1.c ****     { NO_LED, NO_LED, NO_LED,  41,  40,  33 }
+  50:keyboards/crkbd/rev1/rev1.c **** }, {
+  51:keyboards/crkbd/rev1/rev1.c ****     {  85,  16 }, {  50,  13 }, {  16,  20 }, {  16,  38 }, {  50,  48 }, {  85,  52 }, {  95,  63 
+  52:keyboards/crkbd/rev1/rev1.c ****     {  85,  39 }, {  85,  21 }, {  85,   4 }, {  68,   2 }, {  68,  19 }, {  68,  37 }, {  80,  58 
+  53:keyboards/crkbd/rev1/rev1.c ****     {  60,  55 }, {  50,  35 }, {  50,  13 }, {  50,   0 }, {  33,   3 }, {  33,  20 }, {  33,  37 
+  54:keyboards/crkbd/rev1/rev1.c ****     {  16,  42 }, {  16,  24 }, {  16,   7 }, {   0,   7 }, {   0,  24 }, {   0,  41 }, { 139,  16 
+  55:keyboards/crkbd/rev1/rev1.c ****     { 174,  13 }, { 208,  20 }, { 208,  38 }, { 174,  48 }, { 139,  52 }, { 129,  63 }, { 139,  39 
+  56:keyboards/crkbd/rev1/rev1.c ****     { 139,  21 }, { 139,   4 }, { 156,   2 }, { 156,  19 }, { 156,  37 }, { 144,  58 }, { 164,  55 
+  57:keyboards/crkbd/rev1/rev1.c ****     { 174,  35 }, { 174,  13 }, { 174,   0 }, { 191,   3 }, { 191,  20 }, { 191,  37 }, { 208,  42 
+  58:keyboards/crkbd/rev1/rev1.c ****     { 208,  24 }, { 208,   7 }, { 224,   7 }, { 224,  24 }, { 224,  41 }
+  59:keyboards/crkbd/rev1/rev1.c **** }, {
+  60:keyboards/crkbd/rev1/rev1.c ****     2, 2, 2, 2, 2, 2, 1,
+  61:keyboards/crkbd/rev1/rev1.c ****     4, 4, 4, 4, 4, 4, 1,
+  62:keyboards/crkbd/rev1/rev1.c ****     1, 4, 4, 4, 4, 4, 4,
+  63:keyboards/crkbd/rev1/rev1.c ****     4, 4, 4, 1, 1, 1, 2,
+  64:keyboards/crkbd/rev1/rev1.c ****     2, 2, 2, 2, 2, 1, 4,
+  65:keyboards/crkbd/rev1/rev1.c ****     4, 4, 4, 4, 4, 1, 1,
+  66:keyboards/crkbd/rev1/rev1.c ****     4, 4, 4, 4, 4, 4, 4,
+  67:keyboards/crkbd/rev1/rev1.c ****     4, 4, 1, 1, 1
+  68:keyboards/crkbd/rev1/rev1.c **** } };
+  69:keyboards/crkbd/rev1/rev1.c **** #endif
+  70:keyboards/crkbd/rev1/rev1.c **** 
+  71:keyboards/crkbd/rev1/rev1.c **** __attribute__((weak))
+  72:keyboards/crkbd/rev1/rev1.c **** void matrix_init_user(void) {}
+  16               		.loc 1 72 29 view -0
+  17               		.cfi_startproc
+  18               	/* prologue: function */
+  19               	/* frame size = 0 */
+  20               	/* stack size = 0 */
+  21               	.L__stack_usage = 0
+  22               		.loc 1 72 30 view .LVU1
+  23               	/* epilogue start */
+  24               		.loc 1 72 1 is_stmt 0 view .LVU2
+  25 0000 0895      		ret
+  26               		.cfi_endproc
+  27               	.LFE119:
+  29               		.section	.text.matrix_init_kb,"ax",@progbits
+  30               	.global	matrix_init_kb
+  32               	matrix_init_kb:
+  33               	.LFB120:
+  73:keyboards/crkbd/rev1/rev1.c **** 
+  74:keyboards/crkbd/rev1/rev1.c **** void matrix_init_kb(void) {
+  34               		.loc 1 74 27 is_stmt 1 view -0
+  35               		.cfi_startproc
+  36               	/* prologue: function */
+  37               	/* frame size = 0 */
+  38               	/* stack size = 0 */
+  39               	.L__stack_usage = 0
+  75:keyboards/crkbd/rev1/rev1.c **** 
+  76:keyboards/crkbd/rev1/rev1.c **** #ifdef RGB_MATRIX_ENABLE
+  77:keyboards/crkbd/rev1/rev1.c ****     if (!isLeftHand) {
+  78:keyboards/crkbd/rev1/rev1.c ****         g_led_config = (led_config_t){ {
+  79:keyboards/crkbd/rev1/rev1.c ****             {  51,  50,  45,  44,  37,  36 },
+  80:keyboards/crkbd/rev1/rev1.c ****             {  52,  49,  46,  43,  38,  35 },
+  81:keyboards/crkbd/rev1/rev1.c ****             {  53,  48,  47,  42,  39,  34 },
+  82:keyboards/crkbd/rev1/rev1.c ****             { NO_LED, NO_LED, NO_LED,  41,  40,  33 },
+  83:keyboards/crkbd/rev1/rev1.c ****             {  24,  23,  18,  17,  10,   9 },
+  84:keyboards/crkbd/rev1/rev1.c ****             {  25,  22,  19,  16,  11,   8 },
+  85:keyboards/crkbd/rev1/rev1.c ****             {  26,  21,  20,  15,  12,   7 },
+  86:keyboards/crkbd/rev1/rev1.c ****             { NO_LED, NO_LED, NO_LED,  14,  13,   6 }
+  87:keyboards/crkbd/rev1/rev1.c ****         }, {
+  88:keyboards/crkbd/rev1/rev1.c ****             { 139,  16 }, { 174,  13 }, { 208,  20 }, { 208,  38 }, { 174,  48 }, { 139,  52 }, { 1
+  89:keyboards/crkbd/rev1/rev1.c ****             { 139,  39 }, { 139,  21 }, { 139,   4 }, { 156,   2 }, { 156,  19 }, { 156,  37 }, { 1
+  90:keyboards/crkbd/rev1/rev1.c ****             { 164,  55 }, { 174,  35 }, { 174,  13 }, { 174,   0 }, { 191,   3 }, { 191,  20 }, { 1
+  91:keyboards/crkbd/rev1/rev1.c ****             { 208,  42 }, { 208,  24 }, { 208,   7 }, { 224,   7 }, { 224,  24 }, { 224,  41 }, {  
+  92:keyboards/crkbd/rev1/rev1.c ****             {  50,  13 }, {  16,  20 }, {  16,  38 }, {  50,  48 }, {  85,  52 }, {  95,  63 }, {  
+  93:keyboards/crkbd/rev1/rev1.c ****             {  85,  21 }, {  85,   4 }, {  68,   2 }, {  68,  19 }, {  68,  37 }, {  80,  58 }, {  
+  94:keyboards/crkbd/rev1/rev1.c ****             {  50,  35 }, {  50,  13 }, {  50,   0 }, {  33,   3 }, {  33,  20 }, {  33,  37 }, {  
+  95:keyboards/crkbd/rev1/rev1.c ****             {  16,  24 }, {  16,   7 }, {   0,   7 }, {   0,  24 }, {   0,  41 }
+  96:keyboards/crkbd/rev1/rev1.c ****         }, {
+  97:keyboards/crkbd/rev1/rev1.c ****             2, 2, 2, 2, 2, 2, 1,
+  98:keyboards/crkbd/rev1/rev1.c ****             4, 4, 4, 4, 4, 4, 1,
+  99:keyboards/crkbd/rev1/rev1.c ****             1, 4, 4, 4, 4, 4, 4,
+ 100:keyboards/crkbd/rev1/rev1.c ****             4, 4, 4, 1, 1, 1, 2,
+ 101:keyboards/crkbd/rev1/rev1.c ****             2, 2, 2, 2, 2, 1, 4,
+ 102:keyboards/crkbd/rev1/rev1.c ****             4, 4, 4, 4, 4, 1, 1,
+ 103:keyboards/crkbd/rev1/rev1.c ****             4, 4, 4, 4, 4, 4, 4,
+ 104:keyboards/crkbd/rev1/rev1.c ****             4, 4, 1, 1, 1
+ 105:keyboards/crkbd/rev1/rev1.c ****         } };
+ 106:keyboards/crkbd/rev1/rev1.c ****     }
+ 107:keyboards/crkbd/rev1/rev1.c **** #endif
+ 108:keyboards/crkbd/rev1/rev1.c ****     matrix_init_user();
+  40               		.loc 1 108 5 view .LVU4
+  41 0000 0C94 0000 		jmp matrix_init_user
+  42               	.LVL0:
+  43               		.cfi_endproc
+  44               	.LFE120:
+  46               		.text
+  47               	.Letext0:
+  48               		.file 2 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+  49               		.file 3 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+  50               		.file 4 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../StdRequestType.h"
+  51               		.file 5 "tmk_core/common/action.h"
+  52               		.file 6 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../DeviceStandardReq.h"
+  53               		.file 7 "lib/lufa/LUFA/Drivers/USB/Core/USBTask.h"
+  54               		.file 8 "lib/lufa/LUFA/Drivers/USB/Core/HostStandardReq.h"
+  55               		.file 9 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+  56               		.file 10 "tmk_core/common/report.h"
+  57               		.file 11 "tmk_core/common/host_driver.h"
+  58               		.file 12 "tmk_core/common/host.h"
+  59               		.file 13 "tmk_core/common/debug.h"
+  60               		.file 14 "quantum/keycode_config.h"
+  61               		.file 15 "quantum/keymap.h"
+  62               		.file 16 "tmk_core/common/action_layer.h"
+  63               		.file 17 "tmk_core/common/timer.h"
+  64               		.file 18 "tmk_core/common/action_util.h"
+  65               		.file 19 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchai
+  66               		.file 20 "quantum/process_keycode/process_tap_dance.h"
+  67               		.file 21 "quantum/quantum.h"
+  68               		.file 22 "tmk_core/protocol/lufa/lufa.h"
+  69               		.file 23 "keyboards/crkbd/rev1/split_util.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 rev1.c
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccUaCRQd.s:2      *ABS*:0000003e __SP_H__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccUaCRQd.s:3      *ABS*:0000003d __SP_L__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccUaCRQd.s:4      *ABS*:0000003f __SREG__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccUaCRQd.s:5      *ABS*:00000000 __tmp_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccUaCRQd.s:6      *ABS*:00000001 __zero_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccUaCRQd.s:13     .text.matrix_init_user:00000000 matrix_init_user
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccUaCRQd.s:32     .text.matrix_init_kb:00000000 matrix_init_kb
+
+NO UNDEFINED SYMBOLS

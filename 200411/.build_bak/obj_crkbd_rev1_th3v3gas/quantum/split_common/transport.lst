@@ -1,0 +1,259 @@
+   1               		.file	"transport.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.transport_master,"ax",@progbits
+  11               	.global	transport_master
+  13               	transport_master:
+  14               	.LVL0:
+  15               	.LFB114:
+  16               		.file 1 "quantum/split_common/transport.c"
+   1:quantum/split_common/transport.c **** #include <string.h>
+   2:quantum/split_common/transport.c **** #include <stddef.h>
+   3:quantum/split_common/transport.c **** 
+   4:quantum/split_common/transport.c **** #include "config.h"
+   5:quantum/split_common/transport.c **** #include "matrix.h"
+   6:quantum/split_common/transport.c **** #include "quantum.h"
+   7:quantum/split_common/transport.c **** 
+   8:quantum/split_common/transport.c **** #define ROWS_PER_HAND (MATRIX_ROWS / 2)
+   9:quantum/split_common/transport.c **** 
+  10:quantum/split_common/transport.c **** #ifdef RGBLIGHT_ENABLE
+  11:quantum/split_common/transport.c **** #    include "rgblight.h"
+  12:quantum/split_common/transport.c **** #endif
+  13:quantum/split_common/transport.c **** 
+  14:quantum/split_common/transport.c **** #ifdef BACKLIGHT_ENABLE
+  15:quantum/split_common/transport.c **** #    include "backlight.h"
+  16:quantum/split_common/transport.c **** #endif
+  17:quantum/split_common/transport.c **** 
+  18:quantum/split_common/transport.c **** #ifdef ENCODER_ENABLE
+  19:quantum/split_common/transport.c **** #    include "encoder.h"
+  20:quantum/split_common/transport.c **** static pin_t encoders_pad[] = ENCODERS_PAD_A;
+  21:quantum/split_common/transport.c **** #    define NUMBER_OF_ENCODERS (sizeof(encoders_pad) / sizeof(pin_t))
+  22:quantum/split_common/transport.c **** #endif
+  23:quantum/split_common/transport.c **** 
+  24:quantum/split_common/transport.c **** #if defined(USE_I2C)
+  25:quantum/split_common/transport.c **** 
+  26:quantum/split_common/transport.c **** #    include "i2c_master.h"
+  27:quantum/split_common/transport.c **** #    include "i2c_slave.h"
+  28:quantum/split_common/transport.c **** 
+  29:quantum/split_common/transport.c **** typedef struct _I2C_slave_buffer_t {
+  30:quantum/split_common/transport.c ****     matrix_row_t smatrix[ROWS_PER_HAND];
+  31:quantum/split_common/transport.c ****     uint8_t      backlight_level;
+  32:quantum/split_common/transport.c **** #    if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_SPLIT)
+  33:quantum/split_common/transport.c ****     rgblight_syncinfo_t rgblight_sync;
+  34:quantum/split_common/transport.c **** #    endif
+  35:quantum/split_common/transport.c **** #    ifdef ENCODER_ENABLE
+  36:quantum/split_common/transport.c ****     uint8_t encoder_state[NUMBER_OF_ENCODERS];
+  37:quantum/split_common/transport.c **** #    endif
+  38:quantum/split_common/transport.c **** } I2C_slave_buffer_t;
+  39:quantum/split_common/transport.c **** 
+  40:quantum/split_common/transport.c **** static I2C_slave_buffer_t *const i2c_buffer = (I2C_slave_buffer_t *)i2c_slave_reg;
+  41:quantum/split_common/transport.c **** 
+  42:quantum/split_common/transport.c **** #    define I2C_BACKLIGHT_START offsetof(I2C_slave_buffer_t, backlight_level)
+  43:quantum/split_common/transport.c **** #    define I2C_RGB_START offsetof(I2C_slave_buffer_t, rgblight_sync)
+  44:quantum/split_common/transport.c **** #    define I2C_KEYMAP_START offsetof(I2C_slave_buffer_t, smatrix)
+  45:quantum/split_common/transport.c **** #    define I2C_ENCODER_START offsetof(I2C_slave_buffer_t, encoder_state)
+  46:quantum/split_common/transport.c **** 
+  47:quantum/split_common/transport.c **** #    define TIMEOUT 100
+  48:quantum/split_common/transport.c **** 
+  49:quantum/split_common/transport.c **** #    ifndef SLAVE_I2C_ADDRESS
+  50:quantum/split_common/transport.c **** #        define SLAVE_I2C_ADDRESS 0x32
+  51:quantum/split_common/transport.c **** #    endif
+  52:quantum/split_common/transport.c **** 
+  53:quantum/split_common/transport.c **** // Get rows from other half over i2c
+  54:quantum/split_common/transport.c **** bool transport_master(matrix_row_t matrix[]) {
+  17               		.loc 1 54 46 view -0
+  18               		.cfi_startproc
+  19               		.loc 1 54 46 is_stmt 0 view .LVU1
+  20 0000 0F93      		push r16
+  21               	.LCFI0:
+  22               		.cfi_def_cfa_offset 3
+  23               		.cfi_offset 16, -2
+  24 0002 1F93      		push r17
+  25               	.LCFI1:
+  26               		.cfi_def_cfa_offset 4
+  27               		.cfi_offset 17, -3
+  28               	/* prologue: function */
+  29               	/* frame size = 0 */
+  30               	/* stack size = 2 */
+  31               	.L__stack_usage = 2
+  55:quantum/split_common/transport.c ****     i2c_readReg(SLAVE_I2C_ADDRESS, I2C_KEYMAP_START, (void *)matrix, sizeof(i2c_buffer->smatrix), T
+  32               		.loc 1 55 5 is_stmt 1 view .LVU2
+  33 0004 04E6      		ldi r16,lo8(100)
+  34 0006 10E0      		ldi r17,0
+  35 0008 24E0      		ldi r18,lo8(4)
+  36 000a 30E0      		ldi r19,0
+  37 000c AC01      		movw r20,r24
+  38 000e 60E0      		ldi r22,0
+  39 0010 82E3      		ldi r24,lo8(50)
+  40               	.LVL1:
+  41               		.loc 1 55 5 is_stmt 0 view .LVU3
+  42 0012 0E94 0000 		call i2c_readReg
+  43               	.LVL2:
+  56:quantum/split_common/transport.c **** 
+  57:quantum/split_common/transport.c ****     // write backlight info
+  58:quantum/split_common/transport.c **** #    ifdef BACKLIGHT_ENABLE
+  59:quantum/split_common/transport.c ****     uint8_t level = is_backlight_enabled() ? get_backlight_level() : 0;
+  60:quantum/split_common/transport.c ****     if (level != i2c_buffer->backlight_level) {
+  61:quantum/split_common/transport.c ****         if (i2c_writeReg(SLAVE_I2C_ADDRESS, I2C_BACKLIGHT_START, (void *)&level, sizeof(level), TIM
+  62:quantum/split_common/transport.c ****             i2c_buffer->backlight_level = level;
+  63:quantum/split_common/transport.c ****         }
+  64:quantum/split_common/transport.c ****     }
+  65:quantum/split_common/transport.c **** #    endif
+  66:quantum/split_common/transport.c **** 
+  67:quantum/split_common/transport.c **** #    if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_SPLIT)
+  68:quantum/split_common/transport.c ****     if (rgblight_get_change_flags()) {
+  69:quantum/split_common/transport.c ****         rgblight_syncinfo_t rgblight_sync;
+  70:quantum/split_common/transport.c ****         rgblight_get_syncinfo(&rgblight_sync);
+  71:quantum/split_common/transport.c ****         if (i2c_writeReg(SLAVE_I2C_ADDRESS, I2C_RGB_START, (void *)&rgblight_sync, sizeof(rgblight_
+  72:quantum/split_common/transport.c ****             rgblight_clear_change_flags();
+  73:quantum/split_common/transport.c ****         }
+  74:quantum/split_common/transport.c ****     }
+  75:quantum/split_common/transport.c **** #    endif
+  76:quantum/split_common/transport.c **** 
+  77:quantum/split_common/transport.c **** #    ifdef ENCODER_ENABLE
+  78:quantum/split_common/transport.c ****     i2c_readReg(SLAVE_I2C_ADDRESS, I2C_ENCODER_START, (void *)i2c_buffer->encoder_state, sizeof(i2c
+  79:quantum/split_common/transport.c ****     encoder_update_raw(i2c_buffer->encoder_state);
+  80:quantum/split_common/transport.c **** #    endif
+  81:quantum/split_common/transport.c **** 
+  82:quantum/split_common/transport.c ****     return true;
+  44               		.loc 1 82 5 is_stmt 1 view .LVU4
+  83:quantum/split_common/transport.c **** }
+  45               		.loc 1 83 1 is_stmt 0 view .LVU5
+  46 0016 81E0      		ldi r24,lo8(1)
+  47               	/* epilogue start */
+  48 0018 1F91      		pop r17
+  49 001a 0F91      		pop r16
+  50 001c 0895      		ret
+  51               		.cfi_endproc
+  52               	.LFE114:
+  54               		.section	.text.transport_slave,"ax",@progbits
+  55               	.global	transport_slave
+  57               	transport_slave:
+  58               	.LVL3:
+  59               	.LFB115:
+  84:quantum/split_common/transport.c **** 
+  85:quantum/split_common/transport.c **** void transport_slave(matrix_row_t matrix[]) {
+  60               		.loc 1 85 45 is_stmt 1 view -0
+  61               		.cfi_startproc
+  62               	/* prologue: function */
+  63               	/* frame size = 0 */
+  64               	/* stack size = 0 */
+  65               	.L__stack_usage = 0
+  66               		.loc 1 85 45 is_stmt 0 view .LVU7
+  67 0000 FC01      		movw r30,r24
+  86:quantum/split_common/transport.c ****     // Copy matrix to I2C buffer
+  87:quantum/split_common/transport.c ****     memcpy((void *)i2c_buffer->smatrix, (void *)matrix, sizeof(i2c_buffer->smatrix));
+  68               		.loc 1 87 5 is_stmt 1 view .LVU8
+  69 0002 94E0      		ldi r25,lo8(4)
+  70 0004 A0E0      		ldi r26,lo8(i2c_slave_reg)
+  71 0006 B0E0      		ldi r27,hi8(i2c_slave_reg)
+  72               		0:
+  73 0008 0190      		ld r0,Z+
+  74 000a 0D92      		st X+,r0
+  75 000c 9A95      		dec r25
+  76 000e 01F4      		brne 0b
+  77               	/* epilogue start */
+  88:quantum/split_common/transport.c **** 
+  89:quantum/split_common/transport.c **** // Read Backlight Info
+  90:quantum/split_common/transport.c **** #    ifdef BACKLIGHT_ENABLE
+  91:quantum/split_common/transport.c ****     backlight_set(i2c_buffer->backlight_level);
+  92:quantum/split_common/transport.c **** #    endif
+  93:quantum/split_common/transport.c **** 
+  94:quantum/split_common/transport.c **** #    if defined(RGBLIGHT_ENABLE) && defined(RGBLIGHT_SPLIT)
+  95:quantum/split_common/transport.c ****     // Update the RGB with the new data
+  96:quantum/split_common/transport.c ****     if (i2c_buffer->rgblight_sync.status.change_flags != 0) {
+  97:quantum/split_common/transport.c ****         rgblight_update_sync(&i2c_buffer->rgblight_sync, false);
+  98:quantum/split_common/transport.c ****         i2c_buffer->rgblight_sync.status.change_flags = 0;
+  99:quantum/split_common/transport.c ****     }
+ 100:quantum/split_common/transport.c **** #    endif
+ 101:quantum/split_common/transport.c **** 
+ 102:quantum/split_common/transport.c **** #    ifdef ENCODER_ENABLE
+ 103:quantum/split_common/transport.c ****     encoder_state_raw(i2c_buffer->encoder_state);
+ 104:quantum/split_common/transport.c **** #    endif
+ 105:quantum/split_common/transport.c **** }
+  78               		.loc 1 105 1 is_stmt 0 view .LVU9
+  79 0010 0895      		ret
+  80               		.cfi_endproc
+  81               	.LFE115:
+  83               		.section	.text.transport_master_init,"ax",@progbits
+  84               	.global	transport_master_init
+  86               	transport_master_init:
+  87               	.LFB116:
+ 106:quantum/split_common/transport.c **** 
+ 107:quantum/split_common/transport.c **** void transport_master_init(void) { i2c_init(); }
+  88               		.loc 1 107 34 is_stmt 1 view -0
+  89               		.cfi_startproc
+  90               	/* prologue: function */
+  91               	/* frame size = 0 */
+  92               	/* stack size = 0 */
+  93               	.L__stack_usage = 0
+  94               		.loc 1 107 36 view .LVU11
+  95 0000 0C94 0000 		jmp i2c_init
+  96               	.LVL4:
+  97               		.cfi_endproc
+  98               	.LFE116:
+ 100               		.section	.text.transport_slave_init,"ax",@progbits
+ 101               	.global	transport_slave_init
+ 103               	transport_slave_init:
+ 104               	.LFB117:
+ 108:quantum/split_common/transport.c **** 
+ 109:quantum/split_common/transport.c **** void transport_slave_init(void) { i2c_slave_init(SLAVE_I2C_ADDRESS); }
+ 105               		.loc 1 109 33 view -0
+ 106               		.cfi_startproc
+ 107               	/* prologue: function */
+ 108               	/* frame size = 0 */
+ 109               	/* stack size = 0 */
+ 110               	.L__stack_usage = 0
+ 111               		.loc 1 109 35 view .LVU13
+ 112 0000 82E3      		ldi r24,lo8(50)
+ 113 0002 0C94 0000 		jmp i2c_slave_init
+ 114               	.LVL5:
+ 115               		.cfi_endproc
+ 116               	.LFE117:
+ 118               		.text
+ 119               	.Letext0:
+ 120               		.file 2 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+ 121               		.file 3 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+ 122               		.file 4 "tmk_core/common/matrix.h"
+ 123               		.file 5 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../StdRequestType.h"
+ 124               		.file 6 "tmk_core/common/action.h"
+ 125               		.file 7 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../DeviceStandardReq.h"
+ 126               		.file 8 "lib/lufa/LUFA/Drivers/USB/Core/USBTask.h"
+ 127               		.file 9 "lib/lufa/LUFA/Drivers/USB/Core/HostStandardReq.h"
+ 128               		.file 10 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchai
+ 129               		.file 11 "tmk_core/common/report.h"
+ 130               		.file 12 "tmk_core/common/host.h"
+ 131               		.file 13 "tmk_core/common/debug.h"
+ 132               		.file 14 "quantum/keycode_config.h"
+ 133               		.file 15 "quantum/keymap.h"
+ 134               		.file 16 "tmk_core/common/action_layer.h"
+ 135               		.file 17 "tmk_core/common/timer.h"
+ 136               		.file 18 "tmk_core/common/action_util.h"
+ 137               		.file 19 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchai
+ 138               		.file 20 "quantum/process_keycode/process_tap_dance.h"
+ 139               		.file 21 "quantum/quantum.h"
+ 140               		.file 22 "drivers/avr/i2c_slave.h"
+ 141               		.file 23 "drivers/avr/i2c_master.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 transport.c
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc3F0QXk.s:2      *ABS*:0000003e __SP_H__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc3F0QXk.s:3      *ABS*:0000003d __SP_L__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc3F0QXk.s:4      *ABS*:0000003f __SREG__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc3F0QXk.s:5      *ABS*:00000000 __tmp_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc3F0QXk.s:6      *ABS*:00000001 __zero_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc3F0QXk.s:13     .text.transport_master:00000000 transport_master
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc3F0QXk.s:57     .text.transport_slave:00000000 transport_slave
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc3F0QXk.s:86     .text.transport_master_init:00000000 transport_master_init
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc3F0QXk.s:103    .text.transport_slave_init:00000000 transport_slave_init
+
+UNDEFINED SYMBOLS
+i2c_readReg
+i2c_slave_reg
+i2c_init
+i2c_slave_init

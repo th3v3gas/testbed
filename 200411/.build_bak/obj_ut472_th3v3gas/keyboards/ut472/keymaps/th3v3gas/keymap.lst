@@ -1,0 +1,1836 @@
+   1               		.file	"keymap.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.td01_reset,"ax",@progbits
+  11               	.global	td01_reset
+  13               	td01_reset:
+  14               	.LVL0:
+  15               	.LFB111:
+  16               		.file 1 "keyboards/ut472/keymaps/th3v3gas/keymap.c"
+   1:keyboards/ut472/keymaps/th3v3gas/keymap.c **** #include QMK_KEYBOARD_H
+   2:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 
+   3:keyboards/ut472/keymaps/th3v3gas/keymap.c **** /*
+   4:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //unicode WinCompose
+   5:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //<https://github.com/samhocevar/wincompose>
+   6:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //rules.mk (UNICODE_ENABLE = yes)                 |default compose key is [KC_RALT]|
+   7:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //config.h (#define UNICODE_KEY_WINC KC_RALT) <-- |edit config.h to match.         |
+   8:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void matrix_init_user(void) {
+   9:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     set_unicode_input_mode(UC_WINC);
+  10:keyboards/ut472/keymaps/th3v3gas/keymap.c **** };
+  11:keyboards/ut472/keymaps/th3v3gas/keymap.c **** */
+  12:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 
+  13:keyboards/ut472/keymaps/th3v3gas/keymap.c **** enum layers_keymap {
+  14:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   _QWERTY = 0,
+  15:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   _GAME,
+  16:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   _THUMB,
+  17:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   _FUNCTION,
+  18:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   _GAME_FUNCTION,
+  19:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   _CHAT
+  20:keyboards/ut472/keymaps/th3v3gas/keymap.c **** };
+  21:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 
+  22:keyboards/ut472/keymaps/th3v3gas/keymap.c **** #define _QW _QWERTY
+  23:keyboards/ut472/keymaps/th3v3gas/keymap.c **** #define _GM _GAME
+  24:keyboards/ut472/keymaps/th3v3gas/keymap.c **** #define _TH _THUMB
+  25:keyboards/ut472/keymaps/th3v3gas/keymap.c **** #define _FN _FUNCTION
+  26:keyboards/ut472/keymaps/th3v3gas/keymap.c **** #define _GFN _GAME_FUNCTION
+  27:keyboards/ut472/keymaps/th3v3gas/keymap.c **** #define _CH _CHAT
+  28:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 
+  29:keyboards/ut472/keymaps/th3v3gas/keymap.c **** enum custom_keycodes {
+  30:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   TD_F1F11,
+  31:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   TD_F2F12,
+  32:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   TD_CAPS,
+  33:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   TD_QGWOX,
+  34:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   TD_FNWIN,
+  35:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   TD_CHENT,
+  36:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   TD_PLDIS,
+  37:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   TD_GMDIS,
+  38:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   M_DSCRD = SAFE_RANGE, //macro
+  39:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   M_CHESC,
+  40:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   M_GCHAL,
+  41:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   M_GCHTM,
+  42:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   M_GCHAT,
+  43:keyboards/ut472/keymaps/th3v3gas/keymap.c **** };
+  44:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 
+  45:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //tap dance
+  46:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //rules.mk (TAP_DANCE_ENABLE = yes)
+  47:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //config.h (#define TAPPING_TERM 150) double tap window 150-200
+  48:keyboards/ut472/keymaps/th3v3gas/keymap.c **** typedef enum {
+  49:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   SINGLE_TAP,
+  50:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   SINGLE_HOLD,
+  51:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   DOUBLE_SINGLE_TAP
+  52:keyboards/ut472/keymaps/th3v3gas/keymap.c **** } td_state_t;
+  53:keyboards/ut472/keymaps/th3v3gas/keymap.c **** static td_state_t td_state;
+  54:keyboards/ut472/keymaps/th3v3gas/keymap.c **** int cur_dance (qk_tap_dance_state_t *state);
+  55:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td01_finished (qk_tap_dance_state_t *state, void *user_data); //(ref:TD_QGWOX)
+  56:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td01_reset (qk_tap_dance_state_t *state, void *user_data);
+  57:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td03_finished (qk_tap_dance_state_t *state, void *user_data); //(ref:TD_FNWIN)
+  58:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td03_reset (qk_tap_dance_state_t *state, void *user_data);
+  59:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td05_finished (qk_tap_dance_state_t *state, void *user_data); //(ref:TD_CHENT)
+  60:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td05_reset (qk_tap_dance_state_t *state, void *user_data);
+  61:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td07_finished (qk_tap_dance_state_t *state, void *user_data); //(ref:TD_PLDIS)
+  62:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td07_reset (qk_tap_dance_state_t *state, void *user_data);
+  63:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td08_finished (qk_tap_dance_state_t *state, void *user_data); //(ref:TD_GMDIS)
+  64:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td08_reset (qk_tap_dance_state_t *state, void *user_data);
+  65:keyboards/ut472/keymaps/th3v3gas/keymap.c **** int cur_dance (qk_tap_dance_state_t *state) {
+  66:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   if (state->count == 1) {
+  67:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     if (state->interrupted || !state->pressed) { return SINGLE_TAP; }
+  68:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       else { return SINGLE_HOLD; }
+  69:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+  70:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   if (state->count == 2) { return DOUBLE_SINGLE_TAP; }
+  71:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   else { return 3; }
+  72:keyboards/ut472/keymaps/th3v3gas/keymap.c **** }
+  73:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //TD _QWERTY; _GAME; wox (ref:TD_QGWOX)
+  74:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td01_finished (qk_tap_dance_state_t *state, void *user_date) {
+  75:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   td_state = cur_dance(state);
+  76:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+  77:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP: //_QWERTY
+  78:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_clear();
+  79:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+  80:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_HOLD: //_GAME
+  81:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_move(_GM);
+  82:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+  83:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case DOUBLE_SINGLE_TAP: //wox
+  84:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_move(_QW);
+  85:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_LALT);
+  86:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_LCTL);
+  87:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_MINS);
+  88:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_clear();
+  89:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_move(_QW);
+  90:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_LALT);
+  91:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_LCTL);
+  92:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_MINS);
+  93:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+  94:keyboards/ut472/keymaps/th3v3gas/keymap.c **** }
+  95:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td01_reset (qk_tap_dance_state_t *state, void *user_data) {
+  17               		.loc 1 95 64 view -0
+  18               		.cfi_startproc
+  19               	/* prologue: function */
+  20               	/* frame size = 0 */
+  21               	/* stack size = 0 */
+  22               	.L__stack_usage = 0
+  96:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+  23               		.loc 1 96 3 view .LVU1
+  24 0000 8091 0000 		lds r24,td_state
+  25               	.LVL1:
+  26               		.loc 1 96 3 is_stmt 0 view .LVU2
+  27 0004 8111      		cpse r24,__zero_reg__
+  28 0006 00C0      		rjmp .L1
+  97:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP:
+  98:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_move(_QW);
+  29               		.loc 1 98 7 is_stmt 1 view .LVU3
+  30 0008 0C94 0000 		jmp layer_move
+  31               	.LVL2:
+  32               	.L1:
+  33               	/* epilogue start */
+  99:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 100:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_HOLD:
+ 101:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       NULL;
+ 102:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 103:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case DOUBLE_SINGLE_TAP:
+ 104:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       NULL;
+ 105:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 106:keyboards/ut472/keymaps/th3v3gas/keymap.c **** }
+  34               		.loc 1 106 1 is_stmt 0 view .LVU4
+  35 000c 0895      		ret
+  36               		.cfi_endproc
+  37               	.LFE111:
+  39               		.section	.text.td05_reset,"ax",@progbits
+  40               	.global	td05_reset
+  42               	td05_reset:
+  43               	.LVL3:
+  44               	.LFB115:
+ 107:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //TD quote; _FN; win (ref:TD_FNWIN)
+ 108:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td03_finished (qk_tap_dance_state_t *state, void *user_date) {
+ 109:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   td_state = cur_dance(state);
+ 110:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 111:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP: //quote
+ 112:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_QUOT);
+ 113:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 114:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_HOLD: //momentary _FM
+ 115:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_on(_FN);
+ 116:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 117:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case DOUBLE_SINGLE_TAP: //win
+ 118:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_clear();
+ 119:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_move(_QW);
+ 120:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_LGUI);
+ 121:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 122:keyboards/ut472/keymaps/th3v3gas/keymap.c **** }
+ 123:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td03_reset (qk_tap_dance_state_t *state, void *user_data) {
+ 124:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 125:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP:
+ 126:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_QUOT);
+ 127:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 128:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_HOLD:
+ 129:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_off(_FN);
+ 130:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 131:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case DOUBLE_SINGLE_TAP:
+ 132:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_LGUI);
+ 133:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 134:keyboards/ut472/keymaps/th3v3gas/keymap.c **** }
+ 135:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //TD _GAME enter; enter; _CHAT (ref:TD_CHENT)
+ 136:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td05_finished (qk_tap_dance_state_t *state, void *user_date) {
+ 137:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   td_state = cur_dance(state);
+ 138:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 139:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP: //_GAME enter
+ 140:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_move(_GM);
+ 141:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_ENT);
+ 142:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 143:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_HOLD: //enter
+ 144:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_ENT);
+ 145:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_ENT);
+ 146:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 147:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case DOUBLE_SINGLE_TAP:
+ 148:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       NULL;
+ 149:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 150:keyboards/ut472/keymaps/th3v3gas/keymap.c **** }
+ 151:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td05_reset (qk_tap_dance_state_t *state, void *user_data) {
+  45               		.loc 1 151 64 is_stmt 1 view -0
+  46               		.cfi_startproc
+  47               	/* prologue: function */
+  48               	/* frame size = 0 */
+  49               	/* stack size = 0 */
+  50               	.L__stack_usage = 0
+ 152:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+  51               		.loc 1 152 3 view .LVU6
+  52 0000 8091 0000 		lds r24,td_state
+  53               	.LVL4:
+  54               		.loc 1 152 3 is_stmt 0 view .LVU7
+  55 0004 8111      		cpse r24,__zero_reg__
+  56 0006 00C0      		rjmp .L3
+ 153:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP:
+ 154:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_ENT);
+  57               		.loc 1 154 7 is_stmt 1 view .LVU8
+  58 0008 88E2      		ldi r24,lo8(40)
+  59 000a 90E0      		ldi r25,0
+  60 000c 0C94 0000 		jmp unregister_code16
+  61               	.LVL5:
+  62               	.L3:
+  63               	/* epilogue start */
+ 155:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 156:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_HOLD:
+ 157:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       NULL;
+ 158:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 159:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case DOUBLE_SINGLE_TAP:
+ 160:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       NULL;
+ 161:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 162:keyboards/ut472/keymaps/th3v3gas/keymap.c **** }
+  64               		.loc 1 162 1 is_stmt 0 view .LVU9
+  65 0010 0895      		ret
+  66               		.cfi_endproc
+  67               	.LFE115:
+  69               		.section	.text.td07_reset,"ax",@progbits
+  70               	.global	td07_reset
+  72               	td07_reset:
+  73               	.LVL6:
+  74               	.LFB117:
+ 163:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //TD plus; discord (ref:TD_PLDIS)
+ 164:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td07_finished (qk_tap_dance_state_t *state, void *user_date) {
+ 165:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   td_state = cur_dance(state);
+ 166:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 167:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP: //plus
+ 168:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_PPLS);
+ 169:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 170:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_HOLD: //plus
+ 171:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_PPLS);
+ 172:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 173:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case DOUBLE_SINGLE_TAP: //discord
+ 174:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_F17);
+ 175:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_F17);
+ 176:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 177:keyboards/ut472/keymaps/th3v3gas/keymap.c **** }
+ 178:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td07_reset (qk_tap_dance_state_t *state, void *user_data) {
+  75               		.loc 1 178 64 is_stmt 1 view -0
+  76               		.cfi_startproc
+  77               	/* prologue: function */
+  78               	/* frame size = 0 */
+  79               	/* stack size = 0 */
+  80               	.L__stack_usage = 0
+ 179:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+  81               		.loc 1 179 3 view .LVU11
+  82 0000 8091 0000 		lds r24,td_state
+  83               	.LVL7:
+  84               		.loc 1 179 3 is_stmt 0 view .LVU12
+  85 0004 8230      		cpi r24,lo8(2)
+  86 0006 00F4      		brsh .L5
+ 180:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP:
+ 181:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_PPLS);
+  87               		.loc 1 181 7 is_stmt 1 view .LVU13
+  88 0008 87E5      		ldi r24,lo8(87)
+  89 000a 90E0      		ldi r25,0
+  90 000c 0C94 0000 		jmp unregister_code16
+  91               	.LVL8:
+  92               	.L5:
+  93               	/* epilogue start */
+ 182:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 183:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_HOLD:
+ 184:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_PPLS);
+ 185:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 186:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case DOUBLE_SINGLE_TAP:
+ 187:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       NULL;
+ 188:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 189:keyboards/ut472/keymaps/th3v3gas/keymap.c **** }
+  94               		.loc 1 189 1 is_stmt 0 view .LVU14
+  95 0010 0895      		ret
+  96               		.cfi_endproc
+  97               	.LFE117:
+  99               		.section	.text.td08_reset,"ax",@progbits
+ 100               	.global	td08_reset
+ 102               	td08_reset:
+ 103               	.LVL9:
+ 104               	.LFB119:
+ 190:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //TD right; _CHAT, discord (ref:TD_GMDIS)
+ 191:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td08_finished (qk_tap_dance_state_t *state, void *user_date) {
+ 192:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   td_state = cur_dance(state);
+ 193:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 194:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP: //right
+ 195:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_RGHT);
+ 196:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 197:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_HOLD: //right
+ 198:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_RGHT);
+ 199:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 200:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case DOUBLE_SINGLE_TAP: //_CHAT discord
+ 201:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_move(_QW);
+ 202:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_on(_CH);
+ 203:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_F17);
+ 204:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_F17);
+ 205:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 206:keyboards/ut472/keymaps/th3v3gas/keymap.c **** }
+ 207:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void td08_reset (qk_tap_dance_state_t *state, void *user_data) {
+ 105               		.loc 1 207 64 is_stmt 1 view -0
+ 106               		.cfi_startproc
+ 107               	/* prologue: function */
+ 108               	/* frame size = 0 */
+ 109               	/* stack size = 0 */
+ 110               	.L__stack_usage = 0
+ 208:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 111               		.loc 1 208 3 view .LVU16
+ 112 0000 8091 0000 		lds r24,td_state
+ 113               	.LVL10:
+ 114               		.loc 1 208 3 is_stmt 0 view .LVU17
+ 115 0004 8230      		cpi r24,lo8(2)
+ 116 0006 00F4      		brsh .L7
+ 209:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP:
+ 210:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_RGHT);
+ 117               		.loc 1 210 7 is_stmt 1 view .LVU18
+ 118 0008 8FE4      		ldi r24,lo8(79)
+ 119 000a 90E0      		ldi r25,0
+ 120 000c 0C94 0000 		jmp unregister_code16
+ 121               	.LVL11:
+ 122               	.L7:
+ 123               	/* epilogue start */
+ 211:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 212:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_HOLD:
+ 213:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_RGHT);
+ 214:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 215:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case DOUBLE_SINGLE_TAP:
+ 216:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       NULL;
+ 217:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 218:keyboards/ut472/keymaps/th3v3gas/keymap.c **** }
+ 124               		.loc 1 218 1 is_stmt 0 view .LVU19
+ 125 0010 0895      		ret
+ 126               		.cfi_endproc
+ 127               	.LFE119:
+ 129               		.section	.text.td03_reset,"ax",@progbits
+ 130               	.global	td03_reset
+ 132               	td03_reset:
+ 133               	.LVL12:
+ 134               	.LFB113:
+ 123:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 135               		.loc 1 123 64 is_stmt 1 view -0
+ 136               		.cfi_startproc
+ 137               	/* prologue: function */
+ 138               	/* frame size = 0 */
+ 139               	/* stack size = 0 */
+ 140               	.L__stack_usage = 0
+ 124:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP:
+ 141               		.loc 1 124 3 view .LVU21
+ 142 0000 8091 0000 		lds r24,td_state
+ 143               	.LVL13:
+ 124:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP:
+ 144               		.loc 1 124 3 is_stmt 0 view .LVU22
+ 145 0004 8130      		cpi r24,lo8(1)
+ 146 0006 01F0      		breq .L10
+ 147 0008 8823      		tst r24
+ 148 000a 01F0      		breq .L11
+ 149 000c 8230      		cpi r24,lo8(2)
+ 150 000e 01F0      		breq .L12
+ 151 0010 0895      		ret
+ 152               	.L11:
+ 126:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 153               		.loc 1 126 7 is_stmt 1 view .LVU23
+ 154 0012 84E3      		ldi r24,lo8(52)
+ 155 0014 90E0      		ldi r25,0
+ 156               	.L15:
+ 132:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 157               		.loc 1 132 7 is_stmt 0 view .LVU24
+ 158 0016 0C94 0000 		jmp unregister_code16
+ 159               	.LVL14:
+ 160               	.L10:
+ 129:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 161               		.loc 1 129 7 is_stmt 1 view .LVU25
+ 162 001a 83E0      		ldi r24,lo8(3)
+ 163 001c 0C94 0000 		jmp layer_off
+ 164               	.LVL15:
+ 165               	.L12:
+ 132:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 166               		.loc 1 132 7 view .LVU26
+ 167 0020 83EE      		ldi r24,lo8(-29)
+ 168 0022 90E0      		ldi r25,0
+ 169 0024 00C0      		rjmp .L15
+ 170               		.cfi_endproc
+ 171               	.LFE113:
+ 173               		.section	.text.cur_dance,"ax",@progbits
+ 174               	.global	cur_dance
+ 176               	cur_dance:
+ 177               	.LVL16:
+ 178               	.LFB109:
+  65:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   if (state->count == 1) {
+ 179               		.loc 1 65 45 view -0
+ 180               		.cfi_startproc
+ 181               	/* prologue: function */
+ 182               	/* frame size = 0 */
+ 183               	/* stack size = 0 */
+ 184               	.L__stack_usage = 0
+  65:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   if (state->count == 1) {
+ 185               		.loc 1 65 45 is_stmt 0 view .LVU28
+ 186 0000 FC01      		movw r30,r24
+  66:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     if (state->interrupted || !state->pressed) { return SINGLE_TAP; }
+ 187               		.loc 1 66 3 is_stmt 1 view .LVU29
+  66:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     if (state->interrupted || !state->pressed) { return SINGLE_TAP; }
+ 188               		.loc 1 66 12 is_stmt 0 view .LVU30
+ 189 0002 8081      		ld r24,Z
+ 190               	.LVL17:
+  66:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     if (state->interrupted || !state->pressed) { return SINGLE_TAP; }
+ 191               		.loc 1 66 6 view .LVU31
+ 192 0004 8130      		cpi r24,lo8(1)
+ 193 0006 01F4      		brne .L17
+  67:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       else { return SINGLE_HOLD; }
+ 194               		.loc 1 67 5 is_stmt 1 view .LVU32
+  67:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       else { return SINGLE_HOLD; }
+ 195               		.loc 1 67 8 is_stmt 0 view .LVU33
+ 196 0008 8185      		ldd r24,Z+9
+ 197 000a 8111      		cpse r24,__zero_reg__
+ 198 000c 00C0      		rjmp .L19
+  67:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       else { return SINGLE_HOLD; }
+ 199               		.loc 1 67 57 discriminator 2 view .LVU34
+ 200 000e 8285      		ldd r24,Z+10
+ 201 0010 90E0      		ldi r25,0
+ 202 0012 0895      		ret
+ 203               	.L17:
+  70:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   else { return 3; }
+ 204               		.loc 1 70 3 is_stmt 1 view .LVU35
+  70:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   else { return 3; }
+ 205               		.loc 1 70 6 is_stmt 0 view .LVU36
+ 206 0014 8230      		cpi r24,lo8(2)
+ 207 0016 01F0      		breq .L20
+  71:keyboards/ut472/keymaps/th3v3gas/keymap.c **** }
+ 208               		.loc 1 71 17 view .LVU37
+ 209 0018 83E0      		ldi r24,lo8(3)
+ 210 001a 90E0      		ldi r25,0
+ 211 001c 0895      		ret
+ 212               	.L19:
+  67:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       else { return SINGLE_HOLD; }
+ 213               		.loc 1 67 57 view .LVU38
+ 214 001e 90E0      		ldi r25,0
+ 215 0020 80E0      		ldi r24,0
+ 216 0022 0895      		ret
+ 217               	.L20:
+  70:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   else { return 3; }
+ 218               		.loc 1 70 35 view .LVU39
+ 219 0024 82E0      		ldi r24,lo8(2)
+ 220 0026 90E0      		ldi r25,0
+ 221               	/* epilogue start */
+  72:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //TD _QWERTY; _GAME; wox (ref:TD_QGWOX)
+ 222               		.loc 1 72 1 view .LVU40
+ 223 0028 0895      		ret
+ 224               		.cfi_endproc
+ 225               	.LFE109:
+ 227               		.section	.text.td01_finished,"ax",@progbits
+ 228               	.global	td01_finished
+ 230               	td01_finished:
+ 231               	.LVL18:
+ 232               	.LFB110:
+  74:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   td_state = cur_dance(state);
+ 233               		.loc 1 74 67 is_stmt 1 view -0
+ 234               		.cfi_startproc
+ 235               	/* prologue: function */
+ 236               	/* frame size = 0 */
+ 237               	/* stack size = 0 */
+ 238               	.L__stack_usage = 0
+  75:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 239               		.loc 1 75 3 view .LVU42
+  75:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 240               		.loc 1 75 14 is_stmt 0 view .LVU43
+ 241 0000 0E94 0000 		call cur_dance
+ 242               	.LVL19:
+  75:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 243               		.loc 1 75 12 view .LVU44
+ 244 0004 8093 0000 		sts td_state,r24
+  76:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP: //_QWERTY
+ 245               		.loc 1 76 3 is_stmt 1 view .LVU45
+ 246 0008 8130      		cpi r24,lo8(1)
+ 247 000a 01F0      		breq .L22
+ 248 000c 8823      		tst r24
+ 249 000e 01F0      		breq .L23
+ 250 0010 8230      		cpi r24,lo8(2)
+ 251 0012 01F0      		breq .L24
+ 252 0014 0895      		ret
+ 253               	.L23:
+  78:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 254               		.loc 1 78 7 view .LVU46
+ 255 0016 0C94 0000 		jmp layer_clear
+ 256               	.LVL20:
+ 257               	.L22:
+  81:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 258               		.loc 1 81 7 view .LVU47
+ 259 001a 81E0      		ldi r24,lo8(1)
+ 260 001c 0C94 0000 		jmp layer_move
+ 261               	.LVL21:
+ 262               	.L24:
+  84:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_LALT);
+ 263               		.loc 1 84 7 view .LVU48
+ 264 0020 80E0      		ldi r24,0
+ 265 0022 0E94 0000 		call layer_move
+ 266               	.LVL22:
+  85:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_LCTL);
+ 267               		.loc 1 85 7 view .LVU49
+ 268 0026 82EE      		ldi r24,lo8(-30)
+ 269 0028 90E0      		ldi r25,0
+ 270 002a 0E94 0000 		call register_code16
+ 271               	.LVL23:
+  86:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_MINS);
+ 272               		.loc 1 86 7 view .LVU50
+ 273 002e 80EE      		ldi r24,lo8(-32)
+ 274 0030 90E0      		ldi r25,0
+ 275 0032 0E94 0000 		call register_code16
+ 276               	.LVL24:
+  87:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_clear();
+ 277               		.loc 1 87 7 view .LVU51
+ 278 0036 8DE2      		ldi r24,lo8(45)
+ 279 0038 90E0      		ldi r25,0
+ 280 003a 0E94 0000 		call register_code16
+ 281               	.LVL25:
+  88:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_move(_QW);
+ 282               		.loc 1 88 7 view .LVU52
+ 283 003e 0E94 0000 		call layer_clear
+ 284               	.LVL26:
+  89:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_LALT);
+ 285               		.loc 1 89 7 view .LVU53
+ 286 0042 80E0      		ldi r24,0
+ 287 0044 0E94 0000 		call layer_move
+ 288               	.LVL27:
+  90:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_LCTL);
+ 289               		.loc 1 90 7 view .LVU54
+ 290 0048 82EE      		ldi r24,lo8(-30)
+ 291 004a 90E0      		ldi r25,0
+ 292 004c 0E94 0000 		call unregister_code16
+ 293               	.LVL28:
+  91:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_MINS);
+ 294               		.loc 1 91 7 view .LVU55
+ 295 0050 80EE      		ldi r24,lo8(-32)
+ 296 0052 90E0      		ldi r25,0
+ 297 0054 0E94 0000 		call unregister_code16
+ 298               	.LVL29:
+  92:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 299               		.loc 1 92 7 view .LVU56
+ 300 0058 8DE2      		ldi r24,lo8(45)
+ 301 005a 90E0      		ldi r25,0
+ 302 005c 0C94 0000 		jmp unregister_code16
+ 303               	.LVL30:
+ 304               		.cfi_endproc
+ 305               	.LFE110:
+ 307               		.section	.text.td03_finished,"ax",@progbits
+ 308               	.global	td03_finished
+ 310               	td03_finished:
+ 311               	.LVL31:
+ 312               	.LFB112:
+ 108:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   td_state = cur_dance(state);
+ 313               		.loc 1 108 67 view -0
+ 314               		.cfi_startproc
+ 315               	/* prologue: function */
+ 316               	/* frame size = 0 */
+ 317               	/* stack size = 0 */
+ 318               	.L__stack_usage = 0
+ 109:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 319               		.loc 1 109 3 view .LVU58
+ 109:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 320               		.loc 1 109 14 is_stmt 0 view .LVU59
+ 321 0000 0E94 0000 		call cur_dance
+ 322               	.LVL32:
+ 109:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 323               		.loc 1 109 12 view .LVU60
+ 324 0004 8093 0000 		sts td_state,r24
+ 110:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP: //quote
+ 325               		.loc 1 110 3 is_stmt 1 view .LVU61
+ 326 0008 8130      		cpi r24,lo8(1)
+ 327 000a 01F0      		breq .L28
+ 328 000c 8823      		tst r24
+ 329 000e 01F0      		breq .L29
+ 330 0010 8230      		cpi r24,lo8(2)
+ 331 0012 01F0      		breq .L30
+ 332 0014 0895      		ret
+ 333               	.L29:
+ 112:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 334               		.loc 1 112 7 view .LVU62
+ 335 0016 84E3      		ldi r24,lo8(52)
+ 336 0018 90E0      		ldi r25,0
+ 337               	.L33:
+ 120:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 338               		.loc 1 120 7 is_stmt 0 view .LVU63
+ 339 001a 0C94 0000 		jmp register_code16
+ 340               	.LVL33:
+ 341               	.L28:
+ 115:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 342               		.loc 1 115 7 is_stmt 1 view .LVU64
+ 343 001e 83E0      		ldi r24,lo8(3)
+ 344 0020 0C94 0000 		jmp layer_on
+ 345               	.LVL34:
+ 346               	.L30:
+ 118:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_move(_QW);
+ 347               		.loc 1 118 7 view .LVU65
+ 348 0024 0E94 0000 		call layer_clear
+ 349               	.LVL35:
+ 119:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_LGUI);
+ 350               		.loc 1 119 7 view .LVU66
+ 351 0028 80E0      		ldi r24,0
+ 352 002a 0E94 0000 		call layer_move
+ 353               	.LVL36:
+ 120:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 354               		.loc 1 120 7 view .LVU67
+ 355 002e 83EE      		ldi r24,lo8(-29)
+ 356 0030 90E0      		ldi r25,0
+ 357 0032 00C0      		rjmp .L33
+ 358               		.cfi_endproc
+ 359               	.LFE112:
+ 361               		.section	.text.td05_finished,"ax",@progbits
+ 362               	.global	td05_finished
+ 364               	td05_finished:
+ 365               	.LVL37:
+ 366               	.LFB114:
+ 136:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   td_state = cur_dance(state);
+ 367               		.loc 1 136 67 view -0
+ 368               		.cfi_startproc
+ 369               	/* prologue: function */
+ 370               	/* frame size = 0 */
+ 371               	/* stack size = 0 */
+ 372               	.L__stack_usage = 0
+ 137:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 373               		.loc 1 137 3 view .LVU69
+ 137:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 374               		.loc 1 137 14 is_stmt 0 view .LVU70
+ 375 0000 0E94 0000 		call cur_dance
+ 376               	.LVL38:
+ 137:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 377               		.loc 1 137 12 view .LVU71
+ 378 0004 8093 0000 		sts td_state,r24
+ 138:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP: //_GAME enter
+ 379               		.loc 1 138 3 is_stmt 1 view .LVU72
+ 380 0008 8823      		tst r24
+ 381 000a 01F0      		breq .L35
+ 382 000c 8130      		cpi r24,lo8(1)
+ 383 000e 01F0      		breq .L36
+ 384 0010 0895      		ret
+ 385               	.L35:
+ 140:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_ENT);
+ 386               		.loc 1 140 7 view .LVU73
+ 387 0012 81E0      		ldi r24,lo8(1)
+ 388 0014 0E94 0000 		call layer_move
+ 389               	.LVL39:
+ 141:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 390               		.loc 1 141 7 view .LVU74
+ 391 0018 88E2      		ldi r24,lo8(40)
+ 392 001a 90E0      		ldi r25,0
+ 393 001c 0C94 0000 		jmp register_code16
+ 394               	.LVL40:
+ 395               	.L36:
+ 144:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_ENT);
+ 396               		.loc 1 144 7 view .LVU75
+ 397 0020 88E2      		ldi r24,lo8(40)
+ 398 0022 90E0      		ldi r25,0
+ 399 0024 0E94 0000 		call register_code16
+ 400               	.LVL41:
+ 145:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 401               		.loc 1 145 7 view .LVU76
+ 402 0028 88E2      		ldi r24,lo8(40)
+ 403 002a 90E0      		ldi r25,0
+ 404 002c 0C94 0000 		jmp unregister_code16
+ 405               	.LVL42:
+ 406               		.cfi_endproc
+ 407               	.LFE114:
+ 409               		.section	.text.td07_finished,"ax",@progbits
+ 410               	.global	td07_finished
+ 412               	td07_finished:
+ 413               	.LVL43:
+ 414               	.LFB116:
+ 164:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   td_state = cur_dance(state);
+ 415               		.loc 1 164 67 view -0
+ 416               		.cfi_startproc
+ 417               	/* prologue: function */
+ 418               	/* frame size = 0 */
+ 419               	/* stack size = 0 */
+ 420               	.L__stack_usage = 0
+ 165:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 421               		.loc 1 165 3 view .LVU78
+ 165:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 422               		.loc 1 165 14 is_stmt 0 view .LVU79
+ 423 0000 0E94 0000 		call cur_dance
+ 424               	.LVL44:
+ 165:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 425               		.loc 1 165 12 view .LVU80
+ 426 0004 8093 0000 		sts td_state,r24
+ 166:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP: //plus
+ 427               		.loc 1 166 3 is_stmt 1 view .LVU81
+ 428 0008 8230      		cpi r24,lo8(2)
+ 429 000a 00F0      		brlo .L40
+ 430 000c 8230      		cpi r24,lo8(2)
+ 431 000e 01F0      		breq .L41
+ 432 0010 0895      		ret
+ 433               	.L40:
+ 168:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 434               		.loc 1 168 7 view .LVU82
+ 435 0012 87E5      		ldi r24,lo8(87)
+ 436 0014 90E0      		ldi r25,0
+ 437 0016 0C94 0000 		jmp register_code16
+ 438               	.LVL45:
+ 439               	.L41:
+ 174:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_F17);
+ 440               		.loc 1 174 7 view .LVU83
+ 441 001a 8CE6      		ldi r24,lo8(108)
+ 442 001c 90E0      		ldi r25,0
+ 443 001e 0E94 0000 		call register_code16
+ 444               	.LVL46:
+ 175:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 445               		.loc 1 175 7 view .LVU84
+ 446 0022 8CE6      		ldi r24,lo8(108)
+ 447 0024 90E0      		ldi r25,0
+ 448 0026 0C94 0000 		jmp unregister_code16
+ 449               	.LVL47:
+ 450               		.cfi_endproc
+ 451               	.LFE116:
+ 453               		.section	.text.td08_finished,"ax",@progbits
+ 454               	.global	td08_finished
+ 456               	td08_finished:
+ 457               	.LVL48:
+ 458               	.LFB118:
+ 191:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   td_state = cur_dance(state);
+ 459               		.loc 1 191 67 view -0
+ 460               		.cfi_startproc
+ 461               	/* prologue: function */
+ 462               	/* frame size = 0 */
+ 463               	/* stack size = 0 */
+ 464               	.L__stack_usage = 0
+ 192:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 465               		.loc 1 192 3 view .LVU86
+ 192:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 466               		.loc 1 192 14 is_stmt 0 view .LVU87
+ 467 0000 0E94 0000 		call cur_dance
+ 468               	.LVL49:
+ 192:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   switch (td_state) {
+ 469               		.loc 1 192 12 view .LVU88
+ 470 0004 8093 0000 		sts td_state,r24
+ 193:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     case SINGLE_TAP: //right
+ 471               		.loc 1 193 3 is_stmt 1 view .LVU89
+ 472 0008 8230      		cpi r24,lo8(2)
+ 473 000a 00F0      		brlo .L45
+ 474 000c 8230      		cpi r24,lo8(2)
+ 475 000e 01F0      		breq .L46
+ 476 0010 0895      		ret
+ 477               	.L45:
+ 195:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       break;
+ 478               		.loc 1 195 7 view .LVU90
+ 479 0012 8FE4      		ldi r24,lo8(79)
+ 480 0014 90E0      		ldi r25,0
+ 481 0016 0C94 0000 		jmp register_code16
+ 482               	.LVL50:
+ 483               	.L46:
+ 201:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       layer_on(_CH);
+ 484               		.loc 1 201 7 view .LVU91
+ 485 001a 80E0      		ldi r24,0
+ 486 001c 0E94 0000 		call layer_move
+ 487               	.LVL51:
+ 202:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       register_code16(KC_F17);
+ 488               		.loc 1 202 7 view .LVU92
+ 489 0020 85E0      		ldi r24,lo8(5)
+ 490 0022 0E94 0000 		call layer_on
+ 491               	.LVL52:
+ 203:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       unregister_code16(KC_F17);
+ 492               		.loc 1 203 7 view .LVU93
+ 493 0026 8CE6      		ldi r24,lo8(108)
+ 494 0028 90E0      		ldi r25,0
+ 495 002a 0E94 0000 		call register_code16
+ 496               	.LVL53:
+ 204:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 497               		.loc 1 204 7 view .LVU94
+ 498 002e 8CE6      		ldi r24,lo8(108)
+ 499 0030 90E0      		ldi r25,0
+ 500 0032 0C94 0000 		jmp unregister_code16
+ 501               	.LVL54:
+ 502               		.cfi_endproc
+ 503               	.LFE118:
+ 505               		.section	.rodata.process_record_user.str1.1,"aMS",@progbits,1
+ 506               	.LC0:
+ 507 0000 016C 00   		.string	"\001l"
+ 508               	.LC1:
+ 509 0003 0129 00   		.string	"\001)"
+ 510               	.LC2:
+ 511 0006 011C 00   		.string	"\001\034"
+ 512               	.LC3:
+ 513 0009 010E 00   		.string	"\001\016"
+ 514               		.section	.text.process_record_user,"ax",@progbits
+ 515               	.global	process_record_user
+ 517               	process_record_user:
+ 518               	.LVL55:
+ 519               	.LFB120:
+ 219:keyboards/ut472/keymaps/th3v3gas/keymap.c **** qk_tap_dance_action_t tap_dance_actions[] = {
+ 220:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   [TD_F1F11] = ACTION_TAP_DANCE_DOUBLE(KC_F1, KC_F11),
+ 221:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   [TD_F2F12] = ACTION_TAP_DANCE_DOUBLE(KC_F2, KC_F12),
+ 222:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   [TD_CAPS] = ACTION_TAP_DANCE_DOUBLE(_______, KC_CAPS),
+ 223:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   [TD_QGWOX] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td01_finished, td01_reset),
+ 224:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   [TD_FNWIN] = ACTION_TAP_DANCE_FN_ADVANCED_TIME (NULL, td03_finished, td03_reset, 160),
+ 225:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   [TD_CHENT] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, td05_finished, td05_reset, 170),
+ 226:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   [TD_PLDIS] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, td07_finished, td07_reset, 160),
+ 227:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   [TD_GMDIS] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, td08_finished, td08_reset, 160),
+ 228:keyboards/ut472/keymaps/th3v3gas/keymap.c **** };
+ 229:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 
+ 230:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //macros
+ 231:keyboards/ut472/keymaps/th3v3gas/keymap.c **** bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+ 520               		.loc 1 231 65 view -0
+ 521               		.cfi_startproc
+ 522               	/* prologue: function */
+ 523               	/* frame size = 0 */
+ 524               	/* stack size = 0 */
+ 525               	.L__stack_usage = 0
+ 526               		.loc 1 231 65 is_stmt 0 view .LVU96
+ 527 0000 FB01      		movw r30,r22
+ 232:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 	switch (keycode) {
+ 528               		.loc 1 232 2 is_stmt 1 view .LVU97
+ 529 0002 8A30      		cpi r24,10
+ 530 0004 2DE5      		ldi r18,93
+ 531 0006 9207      		cpc r25,r18
+ 532 0008 01F0      		breq .L50
+ 533 000a 00F4      		brsh .L51
+ 534 000c 8830      		cpi r24,8
+ 535 000e 2DE5      		ldi r18,93
+ 536 0010 9207      		cpc r25,r18
+ 537 0012 01F0      		breq .L52
+ 538 0014 8930      		cpi r24,9
+ 539 0016 9D45      		sbci r25,93
+ 540 0018 01F0      		breq .L53
+ 541               	.L72:
+ 233:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		case M_DSCRD: //_GAME Discord
+ 234:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			if (record->event.pressed) {
+ 235:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         send_string(SS_TAP(X_F17));
+ 236:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			};
+ 237:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       return false;
+ 238:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		case M_CHESC: //_GAME ESC
+ 239:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			if (record->event.pressed) {
+ 240:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_GM);
+ 241:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         send_string(SS_TAP(X_ESC));
+ 242:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			};
+ 243:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       return false;
+ 244:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		case M_GCHAL: //_CHAT Y
+ 245:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			if (record->event.pressed) {
+ 246:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_QW);
+ 247:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_on(_CH);
+ 248:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         send_string(SS_TAP(X_Y));
+ 249:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			};
+ 250:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       return false;
+ 251:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		case M_GCHTM: //_CHAT K
+ 252:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			if (record->event.pressed) {
+ 253:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_QW);
+ 254:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_on(_CH);
+ 255:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         send_string(SS_TAP(X_K));
+ 256:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			};
+ 257:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       return false;
+ 258:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		case M_GCHAT: //_CHAT K
+ 259:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			if (record->event.pressed) {
+ 260:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_QW);
+ 261:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_on(_CH);
+ 262:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			};
+ 263:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       return false;
+ 264:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 265:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   return true;
+ 542               		.loc 1 265 10 is_stmt 0 view .LVU98
+ 543 001a 81E0      		ldi r24,lo8(1)
+ 544               	.LVL56:
+ 545               		.loc 1 265 10 view .LVU99
+ 546 001c 0895      		ret
+ 547               	.LVL57:
+ 548               	.L51:
+ 232:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 	switch (keycode) {
+ 549               		.loc 1 232 2 view .LVU100
+ 550 001e 8B30      		cpi r24,11
+ 551 0020 2DE5      		ldi r18,93
+ 552 0022 9207      		cpc r25,r18
+ 553 0024 01F0      		breq .L55
+ 554 0026 8C30      		cpi r24,12
+ 555 0028 9D45      		sbci r25,93
+ 556 002a 01F4      		brne .L72
+ 259:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_QW);
+ 557               		.loc 1 259 4 is_stmt 1 view .LVU101
+ 259:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_QW);
+ 558               		.loc 1 259 21 is_stmt 0 view .LVU102
+ 559 002c 8281      		ldd r24,Z+2
+ 560               	.LVL58:
+ 259:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_QW);
+ 561               		.loc 1 259 7 view .LVU103
+ 562 002e 8823      		tst r24
+ 563 0030 01F0      		breq .L49
+ 260:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_on(_CH);
+ 564               		.loc 1 260 9 is_stmt 1 view .LVU104
+ 565 0032 80E0      		ldi r24,0
+ 566 0034 0E94 0000 		call layer_move
+ 567               	.LVL59:
+ 261:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			};
+ 568               		.loc 1 261 9 view .LVU105
+ 569 0038 85E0      		ldi r24,lo8(5)
+ 570 003a 0E94 0000 		call layer_on
+ 571               	.LVL60:
+ 572 003e 00C0      		rjmp .L73
+ 573               	.LVL61:
+ 574               	.L52:
+ 234:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         send_string(SS_TAP(X_F17));
+ 575               		.loc 1 234 4 view .LVU106
+ 234:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         send_string(SS_TAP(X_F17));
+ 576               		.loc 1 234 21 is_stmt 0 view .LVU107
+ 577 0040 8281      		ldd r24,Z+2
+ 578               	.LVL62:
+ 234:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         send_string(SS_TAP(X_F17));
+ 579               		.loc 1 234 7 view .LVU108
+ 580 0042 8823      		tst r24
+ 581 0044 01F0      		breq .L49
+ 235:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			};
+ 582               		.loc 1 235 9 is_stmt 1 view .LVU109
+ 583 0046 80E0      		ldi r24,lo8(.LC0)
+ 584 0048 90E0      		ldi r25,hi8(.LC0)
+ 585               	.LVL63:
+ 586               	.L74:
+ 255:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			};
+ 587               		.loc 1 255 9 is_stmt 0 view .LVU110
+ 588 004a 0E94 0000 		call send_string
+ 589               	.LVL64:
+ 590               	.L73:
+ 263:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 591               		.loc 1 263 14 view .LVU111
+ 592 004e 80E0      		ldi r24,0
+ 593               	.L49:
+ 594               	/* epilogue start */
+ 266:keyboards/ut472/keymaps/th3v3gas/keymap.c **** };
+ 595               		.loc 1 266 1 view .LVU112
+ 596 0050 0895      		ret
+ 597               	.LVL65:
+ 598               	.L53:
+ 239:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_GM);
+ 599               		.loc 1 239 4 is_stmt 1 view .LVU113
+ 239:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_GM);
+ 600               		.loc 1 239 21 is_stmt 0 view .LVU114
+ 601 0052 8281      		ldd r24,Z+2
+ 602               	.LVL66:
+ 239:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_GM);
+ 603               		.loc 1 239 7 view .LVU115
+ 604 0054 8823      		tst r24
+ 605 0056 01F0      		breq .L49
+ 240:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         send_string(SS_TAP(X_ESC));
+ 606               		.loc 1 240 9 is_stmt 1 view .LVU116
+ 607 0058 81E0      		ldi r24,lo8(1)
+ 608 005a 0E94 0000 		call layer_move
+ 609               	.LVL67:
+ 241:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			};
+ 610               		.loc 1 241 9 view .LVU117
+ 611 005e 80E0      		ldi r24,lo8(.LC1)
+ 612 0060 90E0      		ldi r25,hi8(.LC1)
+ 613 0062 00C0      		rjmp .L74
+ 614               	.LVL68:
+ 615               	.L50:
+ 245:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_QW);
+ 616               		.loc 1 245 4 view .LVU118
+ 245:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_QW);
+ 617               		.loc 1 245 21 is_stmt 0 view .LVU119
+ 618 0064 8281      		ldd r24,Z+2
+ 619               	.LVL69:
+ 245:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_QW);
+ 620               		.loc 1 245 7 view .LVU120
+ 621 0066 8823      		tst r24
+ 622 0068 01F0      		breq .L49
+ 246:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_on(_CH);
+ 623               		.loc 1 246 9 is_stmt 1 view .LVU121
+ 624 006a 80E0      		ldi r24,0
+ 625 006c 0E94 0000 		call layer_move
+ 626               	.LVL70:
+ 247:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         send_string(SS_TAP(X_Y));
+ 627               		.loc 1 247 9 view .LVU122
+ 628 0070 85E0      		ldi r24,lo8(5)
+ 629 0072 0E94 0000 		call layer_on
+ 630               	.LVL71:
+ 248:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			};
+ 631               		.loc 1 248 9 view .LVU123
+ 632 0076 80E0      		ldi r24,lo8(.LC2)
+ 633 0078 90E0      		ldi r25,hi8(.LC2)
+ 634 007a 00C0      		rjmp .L74
+ 635               	.LVL72:
+ 636               	.L55:
+ 252:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_QW);
+ 637               		.loc 1 252 4 view .LVU124
+ 252:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_QW);
+ 638               		.loc 1 252 21 is_stmt 0 view .LVU125
+ 639 007c 8281      		ldd r24,Z+2
+ 640               	.LVL73:
+ 252:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_move(_QW);
+ 641               		.loc 1 252 7 view .LVU126
+ 642 007e 8823      		tst r24
+ 643 0080 01F0      		breq .L49
+ 253:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         layer_on(_CH);
+ 644               		.loc 1 253 9 is_stmt 1 view .LVU127
+ 645 0082 80E0      		ldi r24,0
+ 646 0084 0E94 0000 		call layer_move
+ 647               	.LVL74:
+ 254:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         send_string(SS_TAP(X_K));
+ 648               		.loc 1 254 9 view .LVU128
+ 649 0088 85E0      		ldi r24,lo8(5)
+ 650 008a 0E94 0000 		call layer_on
+ 651               	.LVL75:
+ 255:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 			};
+ 652               		.loc 1 255 9 view .LVU129
+ 653 008e 80E0      		ldi r24,lo8(.LC3)
+ 654 0090 90E0      		ldi r25,hi8(.LC3)
+ 655 0092 00C0      		rjmp .L74
+ 656               		.cfi_endproc
+ 657               	.LFE120:
+ 659               		.section	.text.persistent_default_layer_set,"ax",@progbits
+ 660               	.global	persistent_default_layer_set
+ 662               	persistent_default_layer_set:
+ 663               	.LVL76:
+ 664               	.LFB121:
+ 267:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 
+ 268:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //combos
+ 269:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //rules.mk (COMBO_ENABLE = yes)
+ 270:keyboards/ut472/keymaps/th3v3gas/keymap.c **** //config.h (#define COMBO_COUNT 2) Change combo count as needed (#define COMBO_TERM 50) combo windo
+ 271:keyboards/ut472/keymaps/th3v3gas/keymap.c **** enum combos {
+ 272:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   co_qm, //qmark
+ 273:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   co_ep //exlm
+ 274:keyboards/ut472/keymaps/th3v3gas/keymap.c **** };
+ 275:keyboards/ut472/keymaps/th3v3gas/keymap.c **** const uint16_t PROGMEM qm_combo[] = {KC_COMM, KC_DOT, COMBO_END}; //qmark
+ 276:keyboards/ut472/keymaps/th3v3gas/keymap.c **** const uint16_t PROGMEM ex_combo[] = {KC_M, KC_COMM, COMBO_END}; //exlm
+ 277:keyboards/ut472/keymaps/th3v3gas/keymap.c **** combo_t key_combos[COMBO_COUNT] = {
+ 278:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   [co_qm] = COMBO(qm_combo, KC_QUES), //qmark
+ 279:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   [co_ep] = COMBO(ex_combo, KC_EXLM), //exlm
+ 280:keyboards/ut472/keymaps/th3v3gas/keymap.c **** };
+ 281:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 
+ 282:keyboards/ut472/keymaps/th3v3gas/keymap.c **** const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+ 283:keyboards/ut472/keymaps/th3v3gas/keymap.c **** /* _QW _QWERTY      DEFAULT LAYER
+ 284:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	,-------------------------------------------------------------------------.
+ 285:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|esCTL|  Q  |  W  |  E  |  R  |  T  |  Y  |  U  |  I  |  O  |  P  |Bspace |
+ 286:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|-------------------------------------------------------------------------+
+ 287:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|tab_FN|  A  |  S  |  D  |  F  |  G  |  H  |  J  |  K  |  L  |  ;  |FNWIN | tap dance FNWIN
+ 288:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|-------------------------------------------------------------------------+
+ 289:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	| shift |  Z  |  X  |  C  |  V  |  B  |  N  |M(!) |,(!?)|.(?) |QGWOX|SFTEN| combos (M+,)=! (,+.)=
+ 290:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|-------------------------------------------------------------------------+
+ 291:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|     |     |     |alt -|/ _TH |   space   |* _TH |PLDIS|     |     |     | tap dance PLDIS
+ 292:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	`-------------------------------------------------------------------------'
+ 293:keyboards/ut472/keymaps/th3v3gas/keymap.c **** */
+ 294:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 	[_QWERTY] = LAYOUT(CTL_T(KC_ESC),KC_Q,KC_W,KC_E,KC_R,KC_T,KC_Y,KC_U,KC_I,KC_O,KC_P,KC_BSPC,
+ 295:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		LT(_FN,KC_TAB),KC_A,KC_S,KC_D,KC_F,KC_G,KC_H,KC_J,KC_K,KC_L,KC_SCLN,TD(TD_FNWIN),
+ 296:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		KC_LSFT,KC_Z,KC_X,KC_C,KC_V,KC_B,KC_N,KC_M,KC_COMM,KC_DOT,TD(TD_QGWOX),KC_SFTENT,
+ 297:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		_______,_______,_______,LALT_T(KC_MINS),LT(_TH,KC_SLSH),KC_SPC,LT(_TH,KC_PAST),TD(TD_PLDIS),C(S(K
+ 298:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 
+ 299:keyboards/ut472/keymaps/th3v3gas/keymap.c **** /* _GM _GAME        DEFAULT LAYER
+ 300:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	,-------------------------------------------------------------------------.
+ 301:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	| esc |  T  |  Q  |  W  |  E  |  R  |  J  |  U  |  I  |  O  |  P  |Bspace |
+ 302:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|-------------------------------------------------------------------------+
+ 303:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|tb_GFN|  G  |  A  |  S  |  D  |  F  |  H  |GCHAL|GCHTM|GCHAT|  ;  |FNWIN | macro GCHAL, GCHTM, G
+ 304:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|-------------------------------------------------------------------------+
+ 305:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	| shift |  B  |  Z  |  X  |  C  |  V  |  N  |  M  |  ,  |  .  |QGWOX|SFTEN|
+ 306:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|-------------------------------------------------------------------------+
+ 307:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|     |     |     |  -  |  /  |   space   |* _TH |GMDIS|     |     |     | tap dance GMDIS
+ 308:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	`-------------------------------------------------------------------------'
+ 309:keyboards/ut472/keymaps/th3v3gas/keymap.c **** */
+ 310:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 	[_GAME] = LAYOUT(KC_ESC,KC_T,KC_Q,KC_W,KC_E,KC_R,KC_J,KC_U,KC_I,KC_O,KC_P,KC_BSPC,
+ 311:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     MO(_GFN),KC_G,KC_A,KC_S,KC_D,KC_F,KC_H,M_GCHAL,M_GCHTM,M_GCHAT,KC_SCLN,TD(TD_FNWIN),
+ 312:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     KC_LSFT,KC_B,KC_Z,KC_X,KC_C,KC_V,KC_N,KC_M,KC_COMM,KC_DOT,TD(TD_QGWOX),KC_SFTENT,
+ 313:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     _______,_______,_______,KC_LBRC,KC_RBRC,KC_SPC,LT(_TH,KC_LEFT),TD(TD_GMDIS),_______,_______,___
+ 314:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 
+ 315:keyboards/ut472/keymaps/th3v3gas/keymap.c **** /* _TH _THUMB
+ 316:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	,-------------------------------------------------------------------------.
+ 317:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	| ` ~ |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |  0  |DELETE |
+ 318:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|-------------------------------------------------------------------------+
+ 319:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|      |     |     |     |     |     |left |down | up  |right|     |  \|  |
+ 320:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|-------------------------------------------------------------------------+
+ 321:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|       |undo | cut |copy |paste|     |     |     |     |     |     |     |
+ 322:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|-------------------------------------------------------------------------+
+ 323:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|     |     |     |  @  |  [   |     _     |  ]   |  =  |     |     |     |
+ 324:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	`-------------------------------------------------------------------------'
+ 325:keyboards/ut472/keymaps/th3v3gas/keymap.c **** */
+ 326:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 	[_THUMB] = LAYOUT(KC_GRV,KC_1,KC_2,KC_3,KC_4,KC_5,KC_6,KC_7,KC_8,KC_9,KC_0,KC_DEL,
+ 327:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		_______,_______,_______,_______,_______,XXXXXXX,KC_LEFT,KC_DOWN,KC_UP,KC_RGHT,_______,KC_BSLS,
+ 328:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		_______,C(KC_Z),C(KC_X),C(KC_C),C(KC_V),_______,_______,_______,_______,_______,TD(TD_QGWOX),____
+ 329:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		_______,_______,_______,KC_AT,KC_LBRC,KC_UNDS,KC_RBRC,KC_EQL,_______,_______,_______),
+ 330:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 
+ 331:keyboards/ut472/keymaps/th3v3gas/keymap.c **** /* _FN _FUNCTION
+ 332:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	,-------------------------------------------------------------------------.
+ 333:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|(tsk)|F1F11|F2F12| F3  | F4  | F5  | F6  | F7  | F8  | F9  | F10 |PrtScr | (tsk) = task manager;
+ 334:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|-------------------------------------------------------------------------+
+ 335:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	| CAPS | n1  | n2  | n3  | n4  | n5  | n6  | n7  | n8  | n9  | n0  |      | tap dance TD_CAPS
+ 336:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|-------------------------------------------------------------------------+
+ 337:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|       |     |     |     |     |     |home |pgup |pgdn | end |     |rsft |
+ 338:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|-------------------------------------------------------------------------+
+ 339:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|     |     |     |  @  |  [   |     _     |  ]   |  =  |     |     |     |
+ 340:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	`-------------------------------------------------------------------------'
+ 341:keyboards/ut472/keymaps/th3v3gas/keymap.c **** */
+ 342:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 	[_FUNCTION] = LAYOUT(C(S(KC_ESC)),TD(TD_F1F11),TD(TD_F2F12),KC_F3,KC_F4,KC_F5,KC_F6,KC_F7,KC_F8,KC
+ 343:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		TD(TD_CAPS),KC_P1,KC_P2,KC_P3,KC_P4,KC_P5,KC_P6,KC_P7,KC_P8,KC_P9,KC_P0,_______,
+ 344:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		_______,_______,_______,_______,_______,_______,KC_HOME,KC_PGDN,KC_PGUP, KC_END,TD(TD_QGWOX),KC_R
+ 345:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		_______,_______,_______,KC_AT,KC_LBRC,KC_UNDS,KC_RBRC,KC_EQL,_______,_______,_______),
+ 346:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 
+ 347:keyboards/ut472/keymaps/th3v3gas/keymap.c **** /*    mouse reserved
+ 348:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     |___| 5 | 6 | scrl|
+ 349:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     | 3 |pdn| 4 | f7  |
+ 350:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     | 1 |pup| 2 | f8  |   */
+ 351:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 
+ 352:keyboards/ut472/keymaps/th3v3gas/keymap.c **** /* _GFN _GAME_FUNCTION
+ 353:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	,-------------------------------------------------------------------------.
+ 354:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	| del |  f1  |  7  |  8  |  9  | f4  |  Y  |     |     |     |     |       |
+ 355:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|-------------------------------------------------------------------------+
+ 356:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|      | f2  |  4  |  5  |  6  | f5  |     |  J  |  K  |  L  |     |      |
+ 357:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|------------------------------------------------------------------------+
+ 358:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|  tab  | f3  |  1  |  2  |  3  | f6  |     |     |     |     |     |     |
+ 359:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	|-------------------------------------------------------------------------+
+ 360:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	| ctl |     |     | n/  |   0  |    n*     | F11  | F12 |     |     |     |
+ 361:keyboards/ut472/keymaps/th3v3gas/keymap.c **** *	`-------------------------------------------------------------------------'
+ 362:keyboards/ut472/keymaps/th3v3gas/keymap.c **** */
+ 363:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 	[_GAME_FUNCTION] = LAYOUT(
+ 364:keyboards/ut472/keymaps/th3v3gas/keymap.c ****      KC_DEL,  KC_F1,   KC_7,   KC_8,   KC_9,  KC_F4,   KC_Y,_______,_______,_______,_______,_______
+ 365:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     _______,  KC_F2,   KC_4,   KC_5,   KC_6,  KC_F5,KC_PPLS,   KC_J,   KC_K,   KC_L,_______,_______
+ 366:keyboards/ut472/keymaps/th3v3gas/keymap.c ****      KC_TAB,  KC_F3,   KC_1,   KC_2,   KC_3,  KC_F6,KC_PMNS,_______,_______,_______,TD(TD_QGWOX),__
+ 367:keyboards/ut472/keymaps/th3v3gas/keymap.c ****    KC_RCTRL,_______,_______,KC_PSLS,   KC_0,KC_PAST, KC_F11, KC_F12,_______,_______,_______),
+ 368:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 
+ 369:keyboards/ut472/keymaps/th3v3gas/keymap.c **** // _CH _CHAT
+ 370:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 	[_CHAT] = LAYOUT(
+ 371:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     M_CHESC,_______,_______,_______,_______,_______,_______,_______,_______,_______,_______,_______
+ 372:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		_______,_______,_______,_______,_______,_______,_______,_______,_______,_______,_______,_______,
+ 373:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		_______,_______,_______,_______,_______,_______,_______,_______,_______,_______,TD(TD_QGWOX),TD(T
+ 374:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 		_______,_______,_______,_______,_______,_______,_______,M_DSCRD,_______,_______,_______),
+ 375:keyboards/ut472/keymaps/th3v3gas/keymap.c **** };
+ 376:keyboards/ut472/keymaps/th3v3gas/keymap.c **** 
+ 377:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void persistent_default_layer_set(uint16_t default_layer) {
+ 665               		.loc 1 377 59 view -0
+ 666               		.cfi_startproc
+ 667               		.loc 1 377 59 is_stmt 0 view .LVU131
+ 668 0000 CF93      		push r28
+ 669               	.LCFI0:
+ 670               		.cfi_def_cfa_offset 3
+ 671               		.cfi_offset 28, -2
+ 672 0002 DF93      		push r29
+ 673               	.LCFI1:
+ 674               		.cfi_def_cfa_offset 4
+ 675               		.cfi_offset 29, -3
+ 676               	/* prologue: function */
+ 677               	/* frame size = 0 */
+ 678               	/* stack size = 2 */
+ 679               	.L__stack_usage = 2
+ 680 0004 EC01      		movw r28,r24
+ 378:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   eeconfig_update_default_layer(default_layer);
+ 681               		.loc 1 378 3 is_stmt 1 view .LVU132
+ 682 0006 0E94 0000 		call eeconfig_update_default_layer
+ 683               	.LVL77:
+ 379:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   default_layer_set(default_layer);
+ 684               		.loc 1 379 3 view .LVU133
+ 685 000a BE01      		movw r22,r28
+ 686 000c 90E0      		ldi r25,0
+ 687 000e 80E0      		ldi r24,0
+ 688               	/* epilogue start */
+ 380:keyboards/ut472/keymaps/th3v3gas/keymap.c **** }
+ 689               		.loc 1 380 1 is_stmt 0 view .LVU134
+ 690 0010 DF91      		pop r29
+ 691 0012 CF91      		pop r28
+ 692               	.LVL78:
+ 379:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   default_layer_set(default_layer);
+ 693               		.loc 1 379 3 view .LVU135
+ 694 0014 0C94 0000 		jmp default_layer_set
+ 695               	.LVL79:
+ 379:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   default_layer_set(default_layer);
+ 696               		.loc 1 379 3 view .LVU136
+ 697               		.cfi_endproc
+ 698               	.LFE121:
+ 700               		.section	.text.matrix_init_user,"ax",@progbits
+ 701               	.global	matrix_init_user
+ 703               	matrix_init_user:
+ 704               	.LFB122:
+ 381:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void matrix_init_user(void) {
+ 705               		.loc 1 381 29 is_stmt 1 view -0
+ 706               		.cfi_startproc
+ 707               	/* prologue: function */
+ 708               	/* frame size = 0 */
+ 709               	/* stack size = 0 */
+ 710               	.L__stack_usage = 0
+ 382:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   rgblight_enable();
+ 711               		.loc 1 382 3 view .LVU138
+ 712 0000 0C94 0000 		jmp rgblight_enable
+ 713               	.LVL80:
+ 714               		.cfi_endproc
+ 715               	.LFE122:
+ 717               		.section	.text.matrix_scan_user,"ax",@progbits
+ 718               	.global	matrix_scan_user
+ 720               	matrix_scan_user:
+ 721               	.LFB123:
+ 383:keyboards/ut472/keymaps/th3v3gas/keymap.c **** }
+ 384:keyboards/ut472/keymaps/th3v3gas/keymap.c **** void matrix_scan_user(void) {
+ 722               		.loc 1 384 29 view -0
+ 723               		.cfi_startproc
+ 724 0000 CF93      		push r28
+ 725               	.LCFI2:
+ 726               		.cfi_def_cfa_offset 3
+ 727               		.cfi_offset 28, -2
+ 728               	/* prologue: function */
+ 729               	/* frame size = 0 */
+ 730               	/* stack size = 1 */
+ 731               	.L__stack_usage = 1
+ 385:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   #ifdef RGBLIGHT_ENABLE
+ 386:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   static uint8_t old_layer = 255;
+ 732               		.loc 1 386 3 view .LVU140
+ 387:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   uint8_t new_layer = biton32(layer_state);
+ 733               		.loc 1 387 3 view .LVU141
+ 734               		.loc 1 387 23 is_stmt 0 view .LVU142
+ 735 0002 6091 0000 		lds r22,layer_state
+ 736 0006 7091 0000 		lds r23,layer_state+1
+ 737 000a 8091 0000 		lds r24,layer_state+2
+ 738 000e 9091 0000 		lds r25,layer_state+3
+ 739 0012 0E94 0000 		call biton32
+ 740               	.LVL81:
+ 741 0016 C82F      		mov r28,r24
+ 742               	.LVL82:
+ 388:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   if (old_layer != new_layer) {
+ 743               		.loc 1 388 3 is_stmt 1 view .LVU143
+ 744               		.loc 1 388 6 is_stmt 0 view .LVU144
+ 745 0018 8091 0000 		lds r24,old_layer.6401
+ 746               	.LVL83:
+ 747               		.loc 1 388 6 view .LVU145
+ 748 001c 8C17      		cp r24,r28
+ 749 001e 01F0      		breq .L77
+ 389:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     switch (new_layer) {
+ 750               		.loc 1 389 5 is_stmt 1 view .LVU146
+ 751 0020 C430      		cpi r28,lo8(4)
+ 752 0022 00F4      		brsh .L79
+ 753 0024 C230      		cpi r28,lo8(2)
+ 754 0026 00F4      		brsh .L80
+ 755 0028 CC23      		tst r28
+ 756 002a 01F0      		breq .L81
+ 757 002c C130      		cpi r28,lo8(1)
+ 758 002e 01F0      		breq .L82
+ 759               	.L83:
+ 390:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       case _QW:
+ 391:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_disable_noeeprom();
+ 392:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         break;
+ 393:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       case _GM:
+ 394:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_enable_noeeprom();
+ 395:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_sethsv_noeeprom(HSV_MAGENTA);
+ 396:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_mode_noeeprom(RGBLIGHT_MODE_KNIGHT + 0);
+ 397:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         break;
+ 398:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       case _TH:
+ 399:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_enable_noeeprom();
+ 400:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_sethsv_noeeprom(HSV_CYAN);
+ 401:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_mode_noeeprom(RGBLIGHT_MODE_KNIGHT + 1);
+ 402:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         break;
+ 403:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       case _FN:
+ 404:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_enable_noeeprom();
+ 405:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_sethsv_noeeprom(HSV_CYAN);
+ 406:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_mode_noeeprom(RGBLIGHT_MODE_KNIGHT + 1);
+ 407:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         break;
+ 408:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       case _GFN:
+ 409:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_enable_noeeprom();
+ 410:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_sethsv_noeeprom(HSV_GREEN);
+ 411:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_mode_noeeprom(RGBLIGHT_MODE_KNIGHT + 1);
+ 412:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         break;
+ 413:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       case _CH:
+ 414:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_enable_noeeprom();
+ 415:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_sethsv_noeeprom(HSV_RED);
+ 416:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_mode_noeeprom(RGBLIGHT_MODE_KNIGHT + 2);
+ 417:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         break;
+ 418:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     }
+ 419:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     old_layer = new_layer;
+ 760               		.loc 1 419 5 view .LVU147
+ 761               		.loc 1 419 15 is_stmt 0 view .LVU148
+ 762 0030 C093 0000 		sts old_layer.6401,r28
+ 763               	.L77:
+ 764               	/* epilogue start */
+ 420:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   }
+ 421:keyboards/ut472/keymaps/th3v3gas/keymap.c ****   #endif //RGBLIGHT_ENABLE
+ 422:keyboards/ut472/keymaps/th3v3gas/keymap.c **** }
+ 765               		.loc 1 422 1 view .LVU149
+ 766 0034 CF91      		pop r28
+ 767               	.LVL84:
+ 768               		.loc 1 422 1 view .LVU150
+ 769 0036 0895      		ret
+ 770               	.LVL85:
+ 771               	.L79:
+ 389:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       case _QW:
+ 772               		.loc 1 389 5 view .LVU151
+ 773 0038 C430      		cpi r28,lo8(4)
+ 774 003a 01F0      		breq .L84
+ 775 003c C530      		cpi r28,lo8(5)
+ 776 003e 01F4      		brne .L83
+ 414:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_sethsv_noeeprom(HSV_RED);
+ 777               		.loc 1 414 9 is_stmt 1 view .LVU152
+ 778 0040 0E94 0000 		call rgblight_enable_noeeprom
+ 779               	.LVL86:
+ 415:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_mode_noeeprom(RGBLIGHT_MODE_KNIGHT + 2);
+ 780               		.loc 1 415 9 view .LVU153
+ 781 0044 4FEF      		ldi r20,lo8(-1)
+ 782 0046 6FEF      		ldi r22,lo8(-1)
+ 783 0048 80E0      		ldi r24,0
+ 784 004a 0E94 0000 		call rgblight_sethsv_noeeprom
+ 785               	.LVL87:
+ 416:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         break;
+ 786               		.loc 1 416 9 view .LVU154
+ 787 004e 84E0      		ldi r24,lo8(4)
+ 788 0050 00C0      		rjmp .L86
+ 789               	.L81:
+ 391:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         break;
+ 790               		.loc 1 391 9 view .LVU155
+ 791 0052 0E94 0000 		call rgblight_disable_noeeprom
+ 792               	.LVL88:
+ 392:keyboards/ut472/keymaps/th3v3gas/keymap.c ****       case _GM:
+ 793               		.loc 1 392 9 view .LVU156
+ 794 0056 00C0      		rjmp .L83
+ 795               	.L82:
+ 394:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_sethsv_noeeprom(HSV_MAGENTA);
+ 796               		.loc 1 394 9 view .LVU157
+ 797 0058 0E94 0000 		call rgblight_enable_noeeprom
+ 798               	.LVL89:
+ 395:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_mode_noeeprom(RGBLIGHT_MODE_KNIGHT + 0);
+ 799               		.loc 1 395 9 view .LVU158
+ 800 005c 4FEF      		ldi r20,lo8(-1)
+ 801 005e 6FEF      		ldi r22,lo8(-1)
+ 802 0060 85ED      		ldi r24,lo8(-43)
+ 803 0062 0E94 0000 		call rgblight_sethsv_noeeprom
+ 804               	.LVL90:
+ 396:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         break;
+ 805               		.loc 1 396 9 view .LVU159
+ 806 0066 82E0      		ldi r24,lo8(2)
+ 807               	.L86:
+ 416:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         break;
+ 808               		.loc 1 416 9 is_stmt 0 view .LVU160
+ 809 0068 0E94 0000 		call rgblight_mode_noeeprom
+ 810               	.LVL91:
+ 417:keyboards/ut472/keymaps/th3v3gas/keymap.c ****     }
+ 811               		.loc 1 417 9 is_stmt 1 view .LVU161
+ 812 006c 00C0      		rjmp .L83
+ 813               	.L80:
+ 399:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_sethsv_noeeprom(HSV_CYAN);
+ 814               		.loc 1 399 9 view .LVU162
+ 815 006e 0E94 0000 		call rgblight_enable_noeeprom
+ 816               	.LVL92:
+ 400:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_mode_noeeprom(RGBLIGHT_MODE_KNIGHT + 1);
+ 817               		.loc 1 400 9 view .LVU163
+ 818 0072 4FEF      		ldi r20,lo8(-1)
+ 819 0074 6FEF      		ldi r22,lo8(-1)
+ 820 0076 80E8      		ldi r24,lo8(-128)
+ 821               	.L87:
+ 410:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_mode_noeeprom(RGBLIGHT_MODE_KNIGHT + 1);
+ 822               		.loc 1 410 9 is_stmt 0 view .LVU164
+ 823 0078 0E94 0000 		call rgblight_sethsv_noeeprom
+ 824               	.LVL93:
+ 411:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         break;
+ 825               		.loc 1 411 9 is_stmt 1 view .LVU165
+ 826 007c 83E0      		ldi r24,lo8(3)
+ 827 007e 00C0      		rjmp .L86
+ 828               	.L84:
+ 409:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_sethsv_noeeprom(HSV_GREEN);
+ 829               		.loc 1 409 9 view .LVU166
+ 830 0080 0E94 0000 		call rgblight_enable_noeeprom
+ 831               	.LVL94:
+ 410:keyboards/ut472/keymaps/th3v3gas/keymap.c ****         rgblight_mode_noeeprom(RGBLIGHT_MODE_KNIGHT + 1);
+ 832               		.loc 1 410 9 view .LVU167
+ 833 0084 4FEF      		ldi r20,lo8(-1)
+ 834 0086 6FEF      		ldi r22,lo8(-1)
+ 835 0088 85E5      		ldi r24,lo8(85)
+ 836 008a 00C0      		rjmp .L87
+ 837               		.cfi_endproc
+ 838               	.LFE123:
+ 840               		.section	.data.old_layer.6401,"aw"
+ 843               	old_layer.6401:
+ 844 0000 FF        		.byte	-1
+ 845               	.global	keymaps
+ 846               		.section	.progmem.data.keymaps,"a"
+ 849               	keymaps:
+ 850 0000 2961      		.word	24873
+ 851 0002 1400      		.word	20
+ 852 0004 1A00      		.word	26
+ 853 0006 0800      		.word	8
+ 854 0008 1500      		.word	21
+ 855 000a 1700      		.word	23
+ 856 000c 1C00      		.word	28
+ 857 000e 1800      		.word	24
+ 858 0010 0C00      		.word	12
+ 859 0012 1200      		.word	18
+ 860 0014 1300      		.word	19
+ 861 0016 2A00      		.word	42
+ 862 0018 2B43      		.word	17195
+ 863 001a 0400      		.word	4
+ 864 001c 1600      		.word	22
+ 865 001e 0700      		.word	7
+ 866 0020 0900      		.word	9
+ 867 0022 0A00      		.word	10
+ 868 0024 0B00      		.word	11
+ 869 0026 0D00      		.word	13
+ 870 0028 0E00      		.word	14
+ 871 002a 0F00      		.word	15
+ 872 002c 3300      		.word	51
+ 873 002e 0457      		.word	22276
+ 874 0030 E100      		.word	225
+ 875 0032 1D00      		.word	29
+ 876 0034 1B00      		.word	27
+ 877 0036 0600      		.word	6
+ 878 0038 1900      		.word	25
+ 879 003a 0500      		.word	5
+ 880 003c 1100      		.word	17
+ 881 003e 1000      		.word	16
+ 882 0040 3600      		.word	54
+ 883 0042 3700      		.word	55
+ 884 0044 0357      		.word	22275
+ 885 0046 D95C      		.word	23769
+ 886 0048 0100      		.word	1
+ 887 004a 0100      		.word	1
+ 888 004c 0100      		.word	1
+ 889 004e 2D64      		.word	25645
+ 890 0050 3842      		.word	16952
+ 891 0052 2C00      		.word	44
+ 892 0054 2C00      		.word	44
+ 893 0056 5542      		.word	16981
+ 894 0058 0657      		.word	22278
+ 895 005a 2E03      		.word	814
+ 896 005c 0100      		.word	1
+ 897 005e 0100      		.word	1
+ 898 0060 2900      		.word	41
+ 899 0062 1700      		.word	23
+ 900 0064 1400      		.word	20
+ 901 0066 1A00      		.word	26
+ 902 0068 0800      		.word	8
+ 903 006a 1500      		.word	21
+ 904 006c 0D00      		.word	13
+ 905 006e 1800      		.word	24
+ 906 0070 0C00      		.word	12
+ 907 0072 1200      		.word	18
+ 908 0074 1300      		.word	19
+ 909 0076 2A00      		.word	42
+ 910 0078 0451      		.word	20740
+ 911 007a 0A00      		.word	10
+ 912 007c 0400      		.word	4
+ 913 007e 1600      		.word	22
+ 914 0080 0700      		.word	7
+ 915 0082 0900      		.word	9
+ 916 0084 0B00      		.word	11
+ 917 0086 0A5D      		.word	23818
+ 918 0088 0B5D      		.word	23819
+ 919 008a 0C5D      		.word	23820
+ 920 008c 3300      		.word	51
+ 921 008e 0457      		.word	22276
+ 922 0090 E100      		.word	225
+ 923 0092 0500      		.word	5
+ 924 0094 1D00      		.word	29
+ 925 0096 1B00      		.word	27
+ 926 0098 0600      		.word	6
+ 927 009a 1900      		.word	25
+ 928 009c 1100      		.word	17
+ 929 009e 1000      		.word	16
+ 930 00a0 3600      		.word	54
+ 931 00a2 3700      		.word	55
+ 932 00a4 0357      		.word	22275
+ 933 00a6 D95C      		.word	23769
+ 934 00a8 0100      		.word	1
+ 935 00aa 0100      		.word	1
+ 936 00ac 0100      		.word	1
+ 937 00ae 2F00      		.word	47
+ 938 00b0 3000      		.word	48
+ 939 00b2 2C00      		.word	44
+ 940 00b4 2C00      		.word	44
+ 941 00b6 5042      		.word	16976
+ 942 00b8 0757      		.word	22279
+ 943 00ba 0100      		.word	1
+ 944 00bc 0100      		.word	1
+ 945 00be 0100      		.word	1
+ 946 00c0 3500      		.word	53
+ 947 00c2 1E00      		.word	30
+ 948 00c4 1F00      		.word	31
+ 949 00c6 2000      		.word	32
+ 950 00c8 2100      		.word	33
+ 951 00ca 2200      		.word	34
+ 952 00cc 2300      		.word	35
+ 953 00ce 2400      		.word	36
+ 954 00d0 2500      		.word	37
+ 955 00d2 2600      		.word	38
+ 956 00d4 2700      		.word	39
+ 957 00d6 4C00      		.word	76
+ 958 00d8 0100      		.word	1
+ 959 00da 0100      		.word	1
+ 960 00dc 0100      		.word	1
+ 961 00de 0100      		.word	1
+ 962 00e0 0100      		.word	1
+ 963 00e2 0000      		.word	0
+ 964 00e4 5000      		.word	80
+ 965 00e6 5100      		.word	81
+ 966 00e8 5200      		.word	82
+ 967 00ea 4F00      		.word	79
+ 968 00ec 0100      		.word	1
+ 969 00ee 3100      		.word	49
+ 970 00f0 0100      		.word	1
+ 971 00f2 1D01      		.word	285
+ 972 00f4 1B01      		.word	283
+ 973 00f6 0601      		.word	262
+ 974 00f8 1901      		.word	281
+ 975 00fa 0100      		.word	1
+ 976 00fc 0100      		.word	1
+ 977 00fe 0100      		.word	1
+ 978 0100 0100      		.word	1
+ 979 0102 0100      		.word	1
+ 980 0104 0357      		.word	22275
+ 981 0106 0100      		.word	1
+ 982 0108 0100      		.word	1
+ 983 010a 0100      		.word	1
+ 984 010c 0100      		.word	1
+ 985 010e 1F02      		.word	543
+ 986 0110 2F00      		.word	47
+ 987 0112 2D02      		.word	557
+ 988 0114 2D02      		.word	557
+ 989 0116 3000      		.word	48
+ 990 0118 2E00      		.word	46
+ 991 011a 0100      		.word	1
+ 992 011c 0100      		.word	1
+ 993 011e 0100      		.word	1
+ 994 0120 2903      		.word	809
+ 995 0122 0057      		.word	22272
+ 996 0124 0157      		.word	22273
+ 997 0126 3C00      		.word	60
+ 998 0128 3D00      		.word	61
+ 999 012a 3E00      		.word	62
+ 1000 012c 3F00      		.word	63
+ 1001 012e 4000      		.word	64
+ 1002 0130 4100      		.word	65
+ 1003 0132 4200      		.word	66
+ 1004 0134 4300      		.word	67
+ 1005 0136 4600      		.word	70
+ 1006 0138 0257      		.word	22274
+ 1007 013a 5900      		.word	89
+ 1008 013c 5A00      		.word	90
+ 1009 013e 5B00      		.word	91
+ 1010 0140 5C00      		.word	92
+ 1011 0142 5D00      		.word	93
+ 1012 0144 5E00      		.word	94
+ 1013 0146 5F00      		.word	95
+ 1014 0148 6000      		.word	96
+ 1015 014a 6100      		.word	97
+ 1016 014c 6200      		.word	98
+ 1017 014e 0100      		.word	1
+ 1018 0150 0100      		.word	1
+ 1019 0152 0100      		.word	1
+ 1020 0154 0100      		.word	1
+ 1021 0156 0100      		.word	1
+ 1022 0158 0100      		.word	1
+ 1023 015a 0100      		.word	1
+ 1024 015c 4A00      		.word	74
+ 1025 015e 4E00      		.word	78
+ 1026 0160 4B00      		.word	75
+ 1027 0162 4D00      		.word	77
+ 1028 0164 0357      		.word	22275
+ 1029 0166 E500      		.word	229
+ 1030 0168 0100      		.word	1
+ 1031 016a 0100      		.word	1
+ 1032 016c 0100      		.word	1
+ 1033 016e 1F02      		.word	543
+ 1034 0170 2F00      		.word	47
+ 1035 0172 2D02      		.word	557
+ 1036 0174 2D02      		.word	557
+ 1037 0176 3000      		.word	48
+ 1038 0178 2E00      		.word	46
+ 1039 017a 0100      		.word	1
+ 1040 017c 0100      		.word	1
+ 1041 017e 0100      		.word	1
+ 1042 0180 4C00      		.word	76
+ 1043 0182 3A00      		.word	58
+ 1044 0184 2400      		.word	36
+ 1045 0186 2500      		.word	37
+ 1046 0188 2600      		.word	38
+ 1047 018a 3D00      		.word	61
+ 1048 018c 1C00      		.word	28
+ 1049 018e 0100      		.word	1
+ 1050 0190 0100      		.word	1
+ 1051 0192 0100      		.word	1
+ 1052 0194 0100      		.word	1
+ 1053 0196 0100      		.word	1
+ 1054 0198 0100      		.word	1
+ 1055 019a 3B00      		.word	59
+ 1056 019c 2100      		.word	33
+ 1057 019e 2200      		.word	34
+ 1058 01a0 2300      		.word	35
+ 1059 01a2 3E00      		.word	62
+ 1060 01a4 5700      		.word	87
+ 1061 01a6 0D00      		.word	13
+ 1062 01a8 0E00      		.word	14
+ 1063 01aa 0F00      		.word	15
+ 1064 01ac 0100      		.word	1
+ 1065 01ae 0100      		.word	1
+ 1066 01b0 2B00      		.word	43
+ 1067 01b2 3C00      		.word	60
+ 1068 01b4 1E00      		.word	30
+ 1069 01b6 1F00      		.word	31
+ 1070 01b8 2000      		.word	32
+ 1071 01ba 3F00      		.word	63
+ 1072 01bc 5600      		.word	86
+ 1073 01be 0100      		.word	1
+ 1074 01c0 0100      		.word	1
+ 1075 01c2 0100      		.word	1
+ 1076 01c4 0357      		.word	22275
+ 1077 01c6 0100      		.word	1
+ 1078 01c8 E400      		.word	228
+ 1079 01ca 0100      		.word	1
+ 1080 01cc 0100      		.word	1
+ 1081 01ce 5400      		.word	84
+ 1082 01d0 2700      		.word	39
+ 1083 01d2 5500      		.word	85
+ 1084 01d4 5500      		.word	85
+ 1085 01d6 4400      		.word	68
+ 1086 01d8 4500      		.word	69
+ 1087 01da 0100      		.word	1
+ 1088 01dc 0100      		.word	1
+ 1089 01de 0100      		.word	1
+ 1090 01e0 095D      		.word	23817
+ 1091 01e2 0100      		.word	1
+ 1092 01e4 0100      		.word	1
+ 1093 01e6 0100      		.word	1
+ 1094 01e8 0100      		.word	1
+ 1095 01ea 0100      		.word	1
+ 1096 01ec 0100      		.word	1
+ 1097 01ee 0100      		.word	1
+ 1098 01f0 0100      		.word	1
+ 1099 01f2 0100      		.word	1
+ 1100 01f4 0100      		.word	1
+ 1101 01f6 0100      		.word	1
+ 1102 01f8 0100      		.word	1
+ 1103 01fa 0100      		.word	1
+ 1104 01fc 0100      		.word	1
+ 1105 01fe 0100      		.word	1
+ 1106 0200 0100      		.word	1
+ 1107 0202 0100      		.word	1
+ 1108 0204 0100      		.word	1
+ 1109 0206 0100      		.word	1
+ 1110 0208 0100      		.word	1
+ 1111 020a 0100      		.word	1
+ 1112 020c 0100      		.word	1
+ 1113 020e 0100      		.word	1
+ 1114 0210 0100      		.word	1
+ 1115 0212 0100      		.word	1
+ 1116 0214 0100      		.word	1
+ 1117 0216 0100      		.word	1
+ 1118 0218 0100      		.word	1
+ 1119 021a 0100      		.word	1
+ 1120 021c 0100      		.word	1
+ 1121 021e 0100      		.word	1
+ 1122 0220 0100      		.word	1
+ 1123 0222 0100      		.word	1
+ 1124 0224 0357      		.word	22275
+ 1125 0226 0557      		.word	22277
+ 1126 0228 0100      		.word	1
+ 1127 022a 0100      		.word	1
+ 1128 022c 0100      		.word	1
+ 1129 022e 0100      		.word	1
+ 1130 0230 0100      		.word	1
+ 1131 0232 0100      		.word	1
+ 1132 0234 0100      		.word	1
+ 1133 0236 0100      		.word	1
+ 1134 0238 085D      		.word	23816
+ 1135 023a 0100      		.word	1
+ 1136 023c 0100      		.word	1
+ 1137 023e 0100      		.word	1
+ 1138               	.global	key_combos
+ 1139               		.section	.data.key_combos,"aw"
+ 1142               	key_combos:
+ 1143 0000 0000      		.word	qm_combo
+ 1144 0002 3802      		.word	568
+ 1145 0004 00        		.zero	1
+ 1146 0005 0000      		.word	ex_combo
+ 1147 0007 1E02      		.word	542
+ 1148 0009 00        		.zero	1
+ 1149               	.global	ex_combo
+ 1150               		.section	.progmem.data.ex_combo,"a"
+ 1153               	ex_combo:
+ 1154 0000 1000      		.word	16
+ 1155 0002 3600      		.word	54
+ 1156 0004 0000      		.word	0
+ 1157               	.global	qm_combo
+ 1158               		.section	.progmem.data.qm_combo,"a"
+ 1161               	qm_combo:
+ 1162 0000 3600      		.word	54
+ 1163 0002 3700      		.word	55
+ 1164 0004 0000      		.word	0
+ 1165               	.global	tap_dance_actions
+ 1166               		.section	.data.tap_dance_actions,"aw"
+ 1169               	tap_dance_actions:
+ 1170 0000 0000      		.word	gs(qk_tap_dance_pair_on_each_tap)
+ 1171 0002 0000      		.word	gs(qk_tap_dance_pair_finished)
+ 1172 0004 0000      		.word	gs(qk_tap_dance_pair_reset)
+ 1173 0006 0000 0000 		.zero	14
+ 1173      0000 0000 
+ 1173      0000 0000 
+ 1173      0000 
+ 1174 0014 0000      		.word	__compound_literal.0
+ 1175 0016 0000      		.word	gs(qk_tap_dance_pair_on_each_tap)
+ 1176 0018 0000      		.word	gs(qk_tap_dance_pair_finished)
+ 1177 001a 0000      		.word	gs(qk_tap_dance_pair_reset)
+ 1178 001c 0000 0000 		.zero	14
+ 1178      0000 0000 
+ 1178      0000 0000 
+ 1178      0000 
+ 1179 002a 0000      		.word	__compound_literal.1
+ 1180 002c 0000      		.word	gs(qk_tap_dance_pair_on_each_tap)
+ 1181 002e 0000      		.word	gs(qk_tap_dance_pair_finished)
+ 1182 0030 0000      		.word	gs(qk_tap_dance_pair_reset)
+ 1183 0032 0000 0000 		.zero	14
+ 1183      0000 0000 
+ 1183      0000 0000 
+ 1183      0000 
+ 1184 0040 0000      		.word	__compound_literal.2
+ 1185 0042 0000      		.word	0
+ 1186 0044 0000      		.word	gs(td01_finished)
+ 1187 0046 0000      		.word	gs(td01_reset)
+ 1188 0048 0000 0000 		.zero	14
+ 1188      0000 0000 
+ 1188      0000 0000 
+ 1188      0000 
+ 1189 0056 0000      		.word	0
+ 1190 0058 0000      		.word	0
+ 1191 005a 0000      		.word	gs(td03_finished)
+ 1192 005c 0000      		.word	gs(td03_reset)
+ 1193 005e 0000 0000 		.zero	12
+ 1193      0000 0000 
+ 1193      0000 0000 
+ 1194 006a A000      		.word	160
+ 1195 006c 0000      		.word	0
+ 1196 006e 0000      		.word	0
+ 1197 0070 0000      		.word	gs(td05_finished)
+ 1198 0072 0000      		.word	gs(td05_reset)
+ 1199 0074 0000 0000 		.zero	12
+ 1199      0000 0000 
+ 1199      0000 0000 
+ 1200 0080 AA00      		.word	170
+ 1201 0082 0000      		.word	0
+ 1202 0084 0000      		.word	0
+ 1203 0086 0000      		.word	gs(td07_finished)
+ 1204 0088 0000      		.word	gs(td07_reset)
+ 1205 008a 0000 0000 		.zero	12
+ 1205      0000 0000 
+ 1205      0000 0000 
+ 1206 0096 A000      		.word	160
+ 1207 0098 0000      		.word	0
+ 1208 009a 0000      		.word	0
+ 1209 009c 0000      		.word	gs(td08_finished)
+ 1210 009e 0000      		.word	gs(td08_reset)
+ 1211 00a0 0000 0000 		.zero	12
+ 1211      0000 0000 
+ 1211      0000 0000 
+ 1212 00ac A000      		.word	160
+ 1213 00ae 0000      		.word	0
+ 1214               		.section	.data.__compound_literal.2,"aw"
+ 1217               	__compound_literal.2:
+ 1218 0000 0100      		.word	1
+ 1219 0002 3900      		.word	57
+ 1220               		.section	.data.__compound_literal.1,"aw"
+ 1223               	__compound_literal.1:
+ 1224 0000 3B00      		.word	59
+ 1225 0002 4500      		.word	69
+ 1226               		.section	.data.__compound_literal.0,"aw"
+ 1229               	__compound_literal.0:
+ 1230 0000 3A00      		.word	58
+ 1231 0002 4400      		.word	68
+ 1232               		.section	.bss.td_state,"aw",@nobits
+ 1235               	td_state:
+ 1236 0000 00        		.zero	1
+ 1237               		.text
+ 1238               	.Letext0:
+ 1239               		.file 2 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+ 1240               		.file 3 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+ 1241               		.file 4 "tmk_core/common/keyboard.h"
+ 1242               		.file 5 "tmk_core/common/keycode.h"
+ 1243               		.file 6 "tmk_core/common/action_code.h"
+ 1244               		.file 7 "tmk_core/common/action.h"
+ 1245               		.file 8 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../StdRequestType.h"
+ 1246               		.file 9 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../DeviceStandardReq.h"
+ 1247               		.file 10 "lib/lufa/LUFA/Drivers/USB/Core/USBTask.h"
+ 1248               		.file 11 "lib/lufa/LUFA/Drivers/USB/Core/HostStandardReq.h"
+ 1249               		.file 12 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchai
+ 1250               		.file 13 "tmk_core/common/report.h"
+ 1251               		.file 14 "tmk_core/common/host.h"
+ 1252               		.file 15 "tmk_core/common/debug.h"
+ 1253               		.file 16 "quantum/keycode_config.h"
+ 1254               		.file 17 "quantum/quantum_keycodes.h"
+ 1255               		.file 18 "quantum/keymap.h"
+ 1256               		.file 19 "quantum/rgblight.h"
+ 1257               		.file 20 "./quantum/color.h"
+ 1258               		.file 21 "tmk_core/common/action_layer.h"
+ 1259               		.file 22 "tmk_core/common/timer.h"
+ 1260               		.file 23 "tmk_core/common/action_util.h"
+ 1261               		.file 24 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchai
+ 1262               		.file 25 "quantum/process_keycode/process_tap_dance.h"
+ 1263               		.file 26 "quantum/process_keycode/process_combo.h"
+ 1264               		.file 27 "quantum/quantum.h"
+ 1265               		.file 28 "tmk_core/common/util.h"
+ 1266               		.file 29 "tmk_core/common/eeconfig.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 keymap.c
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:2      *ABS*:0000003e __SP_H__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:3      *ABS*:0000003d __SP_L__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:4      *ABS*:0000003f __SREG__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:5      *ABS*:00000000 __tmp_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:6      *ABS*:00000001 __zero_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:13     .text.td01_reset:00000000 td01_reset
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:1235   .bss.td_state:00000000 td_state
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:42     .text.td05_reset:00000000 td05_reset
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:72     .text.td07_reset:00000000 td07_reset
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:102    .text.td08_reset:00000000 td08_reset
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:132    .text.td03_reset:00000000 td03_reset
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:176    .text.cur_dance:00000000 cur_dance
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:230    .text.td01_finished:00000000 td01_finished
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:310    .text.td03_finished:00000000 td03_finished
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:364    .text.td05_finished:00000000 td05_finished
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:412    .text.td07_finished:00000000 td07_finished
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:456    .text.td08_finished:00000000 td08_finished
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:517    .text.process_record_user:00000000 process_record_user
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:662    .text.persistent_default_layer_set:00000000 persistent_default_layer_set
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:703    .text.matrix_init_user:00000000 matrix_init_user
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:720    .text.matrix_scan_user:00000000 matrix_scan_user
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:843    .data.old_layer.6401:00000000 old_layer.6401
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:849    .progmem.data.keymaps:00000000 keymaps
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:1142   .data.key_combos:00000000 key_combos
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:1161   .progmem.data.qm_combo:00000000 qm_combo
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:1153   .progmem.data.ex_combo:00000000 ex_combo
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:1169   .data.tap_dance_actions:00000000 tap_dance_actions
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:1229   .data.__compound_literal.0:00000000 __compound_literal.0
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:1223   .data.__compound_literal.1:00000000 __compound_literal.1
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\cc7DRWgk.s:1217   .data.__compound_literal.2:00000000 __compound_literal.2
+
+UNDEFINED SYMBOLS
+layer_move
+unregister_code16
+layer_off
+layer_clear
+register_code16
+layer_on
+send_string
+eeconfig_update_default_layer
+default_layer_set
+rgblight_enable
+layer_state
+biton32
+rgblight_enable_noeeprom
+rgblight_sethsv_noeeprom
+rgblight_disable_noeeprom
+rgblight_mode_noeeprom
+qk_tap_dance_pair_on_each_tap
+qk_tap_dance_pair_finished
+qk_tap_dance_pair_reset
+__do_copy_data
+__do_clear_bss

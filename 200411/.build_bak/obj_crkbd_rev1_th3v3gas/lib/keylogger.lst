@@ -1,0 +1,382 @@
+   1               		.file	"keylogger.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.rodata.set_keylog.str1.1,"aMS",@progbits,1
+  11               	.LC0:
+  12 0000 2564 7825 		.string	"%dx%d, k%2d : %c"
+  12      642C 206B 
+  12      2532 6420 
+  12      3A20 2563 
+  12      00
+  13               		.section	.text.set_keylog,"ax",@progbits
+  14               	.global	set_keylog
+  16               	set_keylog:
+  17               	.LVL0:
+  18               	.LFB119:
+  19               		.file 1 "keyboards/crkbd/lib/keylogger.c"
+   1:keyboards/crkbd/lib/keylogger.c **** #include <stdio.h>
+   2:keyboards/crkbd/lib/keylogger.c **** #include "crkbd.h"
+   3:keyboards/crkbd/lib/keylogger.c **** 
+   4:keyboards/crkbd/lib/keylogger.c **** char keylog_str[24] = {};
+   5:keyboards/crkbd/lib/keylogger.c **** char keylogs_str[21] = {};
+   6:keyboards/crkbd/lib/keylogger.c **** int keylogs_str_idx = 0;
+   7:keyboards/crkbd/lib/keylogger.c **** 
+   8:keyboards/crkbd/lib/keylogger.c **** const char code_to_name[60] = {
+   9:keyboards/crkbd/lib/keylogger.c ****     ' ', ' ', ' ', ' ', 'a', 'b', 'c', 'd', 'e', 'f',
+  10:keyboards/crkbd/lib/keylogger.c ****     'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
+  11:keyboards/crkbd/lib/keylogger.c ****     'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+  12:keyboards/crkbd/lib/keylogger.c ****     '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+  13:keyboards/crkbd/lib/keylogger.c ****     'R', 'E', 'B', 'T', ' ', ' ', ' ', ' ', ' ', ' ',
+  14:keyboards/crkbd/lib/keylogger.c ****     ' ', ';', '\'', ' ', ',', '.', '/', ' ', ' ', ' '};
+  15:keyboards/crkbd/lib/keylogger.c **** 
+  16:keyboards/crkbd/lib/keylogger.c **** void set_keylog(uint16_t keycode, keyrecord_t *record) {
+  20               		.loc 1 16 56 view -0
+  21               		.cfi_startproc
+  22               		.loc 1 16 56 is_stmt 0 view .LVU1
+  23 0000 CF93      		push r28
+  24               	.LCFI0:
+  25               		.cfi_def_cfa_offset 3
+  26               		.cfi_offset 28, -2
+  27               	/* prologue: function */
+  28               	/* frame size = 0 */
+  29               	/* stack size = 1 */
+  30               	.L__stack_usage = 1
+  17:keyboards/crkbd/lib/keylogger.c ****   char name = ' ';
+  31               		.loc 1 17 3 is_stmt 1 view .LVU2
+  32               	.LVL1:
+  18:keyboards/crkbd/lib/keylogger.c ****   if (keycode < 60) {
+  33               		.loc 1 18 3 view .LVU3
+  17:keyboards/crkbd/lib/keylogger.c ****   char name = ' ';
+  34               		.loc 1 17 8 is_stmt 0 view .LVU4
+  35 0002 C0E2      		ldi r28,lo8(32)
+  36               		.loc 1 18 6 view .LVU5
+  37 0004 8C33      		cpi r24,60
+  38 0006 9105      		cpc r25,__zero_reg__
+  39 0008 00F4      		brsh .L2
+  19:keyboards/crkbd/lib/keylogger.c ****     name = code_to_name[keycode];
+  40               		.loc 1 19 5 is_stmt 1 view .LVU6
+  41               		.loc 1 19 10 is_stmt 0 view .LVU7
+  42 000a FC01      		movw r30,r24
+  43 000c E050      		subi r30,lo8(-(code_to_name))
+  44 000e F040      		sbci r31,hi8(-(code_to_name))
+  45 0010 C081      		ld r28,Z
+  46               	.LVL2:
+  47               	.L2:
+  20:keyboards/crkbd/lib/keylogger.c ****   }
+  21:keyboards/crkbd/lib/keylogger.c **** 
+  22:keyboards/crkbd/lib/keylogger.c ****   // update keylog
+  23:keyboards/crkbd/lib/keylogger.c ****   snprintf(keylog_str, sizeof(keylog_str), "%dx%d, k%2d : %c",
+  48               		.loc 1 23 3 is_stmt 1 view .LVU8
+  49 0012 1F92      		push __zero_reg__
+  50               	.LCFI1:
+  51               		.cfi_def_cfa_offset 4
+  52 0014 CF93      		push r28
+  53               	.LCFI2:
+  54               		.cfi_def_cfa_offset 5
+  55 0016 9F93      		push r25
+  56               	.LCFI3:
+  57               		.cfi_def_cfa_offset 6
+  58 0018 8F93      		push r24
+  59               	.LCFI4:
+  60               		.cfi_def_cfa_offset 7
+  61 001a FB01      		movw r30,r22
+  62 001c 8081      		ld r24,Z
+  63               	.LVL3:
+  64               		.loc 1 23 3 is_stmt 0 view .LVU9
+  65 001e 1F92      		push __zero_reg__
+  66               	.LCFI5:
+  67               		.cfi_def_cfa_offset 8
+  68 0020 8F93      		push r24
+  69               	.LCFI6:
+  70               		.cfi_def_cfa_offset 9
+  71 0022 8181      		ldd r24,Z+1
+  72 0024 1F92      		push __zero_reg__
+  73               	.LCFI7:
+  74               		.cfi_def_cfa_offset 10
+  75 0026 8F93      		push r24
+  76               	.LCFI8:
+  77               		.cfi_def_cfa_offset 11
+  78 0028 80E0      		ldi r24,lo8(.LC0)
+  79 002a 90E0      		ldi r25,hi8(.LC0)
+  80 002c 9F93      		push r25
+  81               	.LCFI9:
+  82               		.cfi_def_cfa_offset 12
+  83 002e 8F93      		push r24
+  84               	.LCFI10:
+  85               		.cfi_def_cfa_offset 13
+  86 0030 1F92      		push __zero_reg__
+  87               	.LCFI11:
+  88               		.cfi_def_cfa_offset 14
+  89 0032 88E1      		ldi r24,lo8(24)
+  90 0034 8F93      		push r24
+  91               	.LCFI12:
+  92               		.cfi_def_cfa_offset 15
+  93 0036 80E0      		ldi r24,lo8(keylog_str)
+  94 0038 90E0      		ldi r25,hi8(keylog_str)
+  95 003a 9F93      		push r25
+  96               	.LCFI13:
+  97               		.cfi_def_cfa_offset 16
+  98 003c 8F93      		push r24
+  99               	.LCFI14:
+ 100               		.cfi_def_cfa_offset 17
+ 101 003e 0E94 0000 		call snprintf
+ 102               	.LVL4:
+  24:keyboards/crkbd/lib/keylogger.c ****            record->event.key.row, record->event.key.col,
+  25:keyboards/crkbd/lib/keylogger.c ****            keycode, name);
+  26:keyboards/crkbd/lib/keylogger.c **** 
+  27:keyboards/crkbd/lib/keylogger.c ****   // update keylogs
+  28:keyboards/crkbd/lib/keylogger.c ****   if (keylogs_str_idx == sizeof(keylogs_str) - 1) {
+ 103               		.loc 1 28 3 is_stmt 1 view .LVU10
+ 104               		.loc 1 28 6 is_stmt 0 view .LVU11
+ 105 0042 8DB7      		in r24,__SP_L__
+ 106 0044 9EB7      		in r25,__SP_H__
+ 107 0046 0E96      		adiw r24,14
+ 108 0048 0FB6      		in __tmp_reg__,__SREG__
+ 109 004a F894      		cli
+ 110 004c 9EBF      		out __SP_H__,r25
+ 111 004e 0FBE      		out __SREG__,__tmp_reg__
+ 112 0050 8DBF      		out __SP_L__,r24
+ 113               	.LCFI15:
+ 114               		.cfi_def_cfa_offset 3
+ 115 0052 8091 0000 		lds r24,keylogs_str_idx
+ 116 0056 9091 0000 		lds r25,keylogs_str_idx+1
+ 117 005a 4497      		sbiw r24,20
+ 118 005c 01F4      		brne .L3
+  29:keyboards/crkbd/lib/keylogger.c ****     keylogs_str_idx = 0;
+ 119               		.loc 1 29 5 is_stmt 1 view .LVU12
+ 120               		.loc 1 29 21 is_stmt 0 view .LVU13
+ 121 005e 1092 0000 		sts keylogs_str_idx+1,__zero_reg__
+ 122 0062 1092 0000 		sts keylogs_str_idx,__zero_reg__
+  30:keyboards/crkbd/lib/keylogger.c ****     for (int i = 0; i < sizeof(keylogs_str) - 1; i++) {
+ 123               		.loc 1 30 5 is_stmt 1 view .LVU14
+ 124               	.LBB2:
+ 125               		.loc 1 30 10 view .LVU15
+ 126               	.LVL5:
+ 127               		.loc 1 30 10 is_stmt 0 view .LVU16
+ 128 0066 E0E0      		ldi r30,lo8(keylogs_str)
+ 129 0068 F0E0      		ldi r31,hi8(keylogs_str)
+  31:keyboards/crkbd/lib/keylogger.c ****       keylogs_str[i] = ' ';
+ 130               		.loc 1 31 22 view .LVU17
+ 131 006a 80E2      		ldi r24,lo8(32)
+ 132               	.LVL6:
+ 133               	.L4:
+ 134               		.loc 1 31 7 is_stmt 1 discriminator 3 view .LVU18
+ 135               		.loc 1 31 22 is_stmt 0 discriminator 3 view .LVU19
+ 136 006c 8193      		st Z+,r24
+ 137               	.LVL7:
+  30:keyboards/crkbd/lib/keylogger.c ****     for (int i = 0; i < sizeof(keylogs_str) - 1; i++) {
+ 138               		.loc 1 30 5 discriminator 3 view .LVU20
+ 139 006e 90E0      		ldi r25,hi8(keylogs_str+20)
+ 140 0070 E030      		cpi r30,lo8(keylogs_str+20)
+ 141 0072 F907      		cpc r31,r25
+ 142 0074 01F4      		brne .L4
+ 143               	.LVL8:
+ 144               	.L3:
+  30:keyboards/crkbd/lib/keylogger.c ****     for (int i = 0; i < sizeof(keylogs_str) - 1; i++) {
+ 145               		.loc 1 30 5 discriminator 3 view .LVU21
+ 146               	.LBE2:
+  32:keyboards/crkbd/lib/keylogger.c ****     }
+  33:keyboards/crkbd/lib/keylogger.c ****   }
+  34:keyboards/crkbd/lib/keylogger.c **** 
+  35:keyboards/crkbd/lib/keylogger.c ****   keylogs_str[keylogs_str_idx] = name;
+ 147               		.loc 1 35 3 is_stmt 1 view .LVU22
+ 148               		.loc 1 35 14 is_stmt 0 view .LVU23
+ 149 0076 8091 0000 		lds r24,keylogs_str_idx
+ 150 007a 9091 0000 		lds r25,keylogs_str_idx+1
+ 151               		.loc 1 35 32 view .LVU24
+ 152 007e FC01      		movw r30,r24
+ 153 0080 E050      		subi r30,lo8(-(keylogs_str))
+ 154 0082 F040      		sbci r31,hi8(-(keylogs_str))
+ 155 0084 C083      		st Z,r28
+  36:keyboards/crkbd/lib/keylogger.c ****   keylogs_str_idx++;
+ 156               		.loc 1 36 3 is_stmt 1 view .LVU25
+ 157               		.loc 1 36 18 is_stmt 0 view .LVU26
+ 158 0086 0196      		adiw r24,1
+ 159 0088 9093 0000 		sts keylogs_str_idx+1,r25
+ 160 008c 8093 0000 		sts keylogs_str_idx,r24
+ 161               	/* epilogue start */
+  37:keyboards/crkbd/lib/keylogger.c **** }
+ 162               		.loc 1 37 1 view .LVU27
+ 163 0090 CF91      		pop r28
+ 164               	.LVL9:
+ 165               		.loc 1 37 1 view .LVU28
+ 166 0092 0895      		ret
+ 167               		.cfi_endproc
+ 168               	.LFE119:
+ 170               		.section	.text.read_keylog,"ax",@progbits
+ 171               	.global	read_keylog
+ 173               	read_keylog:
+ 174               	.LFB120:
+  38:keyboards/crkbd/lib/keylogger.c **** 
+  39:keyboards/crkbd/lib/keylogger.c **** const char *read_keylog(void) {
+ 175               		.loc 1 39 31 is_stmt 1 view -0
+ 176               		.cfi_startproc
+ 177               	/* prologue: function */
+ 178               	/* frame size = 0 */
+ 179               	/* stack size = 0 */
+ 180               	.L__stack_usage = 0
+  40:keyboards/crkbd/lib/keylogger.c ****   return keylog_str;
+ 181               		.loc 1 40 3 view .LVU30
+  41:keyboards/crkbd/lib/keylogger.c **** }
+ 182               		.loc 1 41 1 is_stmt 0 view .LVU31
+ 183 0000 80E0      		ldi r24,lo8(keylog_str)
+ 184 0002 90E0      		ldi r25,hi8(keylog_str)
+ 185               	/* epilogue start */
+ 186 0004 0895      		ret
+ 187               		.cfi_endproc
+ 188               	.LFE120:
+ 190               		.section	.text.read_keylogs,"ax",@progbits
+ 191               	.global	read_keylogs
+ 193               	read_keylogs:
+ 194               	.LFB121:
+  42:keyboards/crkbd/lib/keylogger.c **** 
+  43:keyboards/crkbd/lib/keylogger.c **** const char *read_keylogs(void) {
+ 195               		.loc 1 43 32 is_stmt 1 view -0
+ 196               		.cfi_startproc
+ 197               	/* prologue: function */
+ 198               	/* frame size = 0 */
+ 199               	/* stack size = 0 */
+ 200               	.L__stack_usage = 0
+  44:keyboards/crkbd/lib/keylogger.c ****   return keylogs_str;
+ 201               		.loc 1 44 3 view .LVU33
+  45:keyboards/crkbd/lib/keylogger.c **** }
+ 202               		.loc 1 45 1 is_stmt 0 view .LVU34
+ 203 0000 80E0      		ldi r24,lo8(keylogs_str)
+ 204 0002 90E0      		ldi r25,hi8(keylogs_str)
+ 205               	/* epilogue start */
+ 206 0004 0895      		ret
+ 207               		.cfi_endproc
+ 208               	.LFE121:
+ 210               	.global	code_to_name
+ 211               		.section	.rodata.code_to_name,"a"
+ 214               	code_to_name:
+ 215 0000 20        		.byte	32
+ 216 0001 20        		.byte	32
+ 217 0002 20        		.byte	32
+ 218 0003 20        		.byte	32
+ 219 0004 61        		.byte	97
+ 220 0005 62        		.byte	98
+ 221 0006 63        		.byte	99
+ 222 0007 64        		.byte	100
+ 223 0008 65        		.byte	101
+ 224 0009 66        		.byte	102
+ 225 000a 67        		.byte	103
+ 226 000b 68        		.byte	104
+ 227 000c 69        		.byte	105
+ 228 000d 6A        		.byte	106
+ 229 000e 6B        		.byte	107
+ 230 000f 6C        		.byte	108
+ 231 0010 6D        		.byte	109
+ 232 0011 6E        		.byte	110
+ 233 0012 6F        		.byte	111
+ 234 0013 70        		.byte	112
+ 235 0014 71        		.byte	113
+ 236 0015 72        		.byte	114
+ 237 0016 73        		.byte	115
+ 238 0017 74        		.byte	116
+ 239 0018 75        		.byte	117
+ 240 0019 76        		.byte	118
+ 241 001a 77        		.byte	119
+ 242 001b 78        		.byte	120
+ 243 001c 79        		.byte	121
+ 244 001d 7A        		.byte	122
+ 245 001e 31        		.byte	49
+ 246 001f 32        		.byte	50
+ 247 0020 33        		.byte	51
+ 248 0021 34        		.byte	52
+ 249 0022 35        		.byte	53
+ 250 0023 36        		.byte	54
+ 251 0024 37        		.byte	55
+ 252 0025 38        		.byte	56
+ 253 0026 39        		.byte	57
+ 254 0027 30        		.byte	48
+ 255 0028 52        		.byte	82
+ 256 0029 45        		.byte	69
+ 257 002a 42        		.byte	66
+ 258 002b 54        		.byte	84
+ 259 002c 20        		.byte	32
+ 260 002d 20        		.byte	32
+ 261 002e 20        		.byte	32
+ 262 002f 20        		.byte	32
+ 263 0030 20        		.byte	32
+ 264 0031 20        		.byte	32
+ 265 0032 20        		.byte	32
+ 266 0033 3B        		.byte	59
+ 267 0034 27        		.byte	39
+ 268 0035 20        		.byte	32
+ 269 0036 2C        		.byte	44
+ 270 0037 2E        		.byte	46
+ 271 0038 2F        		.byte	47
+ 272 0039 20        		.byte	32
+ 273 003a 20        		.byte	32
+ 274 003b 20        		.byte	32
+ 275               	.global	keylogs_str_idx
+ 276               		.section	.bss.keylogs_str_idx,"aw",@nobits
+ 279               	keylogs_str_idx:
+ 280 0000 0000      		.zero	2
+ 281               	.global	keylogs_str
+ 282               		.section	.bss.keylogs_str,"aw",@nobits
+ 285               	keylogs_str:
+ 286 0000 0000 0000 		.zero	21
+ 286      0000 0000 
+ 286      0000 0000 
+ 286      0000 0000 
+ 286      0000 0000 
+ 287               	.global	keylog_str
+ 288               		.section	.bss.keylog_str,"aw",@nobits
+ 291               	keylog_str:
+ 292 0000 0000 0000 		.zero	24
+ 292      0000 0000 
+ 292      0000 0000 
+ 292      0000 0000 
+ 292      0000 0000 
+ 293               		.text
+ 294               	.Letext0:
+ 295               		.file 2 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+ 296               		.file 3 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+ 297               		.file 4 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchain
+ 298               		.file 5 "tmk_core/common/keyboard.h"
+ 299               		.file 6 "tmk_core/common/action.h"
+ 300               		.file 7 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../StdRequestType.h"
+ 301               		.file 8 "lib/lufa/LUFA/Drivers/USB/Core/AVR8/../DeviceStandardReq.h"
+ 302               		.file 9 "lib/lufa/LUFA/Drivers/USB/Core/USBTask.h"
+ 303               		.file 10 "lib/lufa/LUFA/Drivers/USB/Core/HostStandardReq.h"
+ 304               		.file 11 "tmk_core/common/report.h"
+ 305               		.file 12 "tmk_core/common/host_driver.h"
+ 306               		.file 13 "tmk_core/common/host.h"
+ 307               		.file 14 "tmk_core/common/debug.h"
+ 308               		.file 15 "quantum/keycode_config.h"
+ 309               		.file 16 "quantum/keymap.h"
+ 310               		.file 17 "tmk_core/common/action_layer.h"
+ 311               		.file 18 "tmk_core/common/timer.h"
+ 312               		.file 19 "tmk_core/common/action_util.h"
+ 313               		.file 20 "c:\\users\\nonej\\documents\\keyboard\\msys64\\home\\nonej\\qmk_utils\\avr8-gnu-toolchai
+ 314               		.file 21 "quantum/process_keycode/process_tap_dance.h"
+ 315               		.file 22 "quantum/quantum.h"
+ 316               		.file 23 "tmk_core/protocol/lufa/lufa.h"
+ 317               		.file 24 "keyboards/crkbd/rev1/split_util.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 keylogger.c
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccxFFhbq.s:2      *ABS*:0000003e __SP_H__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccxFFhbq.s:3      *ABS*:0000003d __SP_L__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccxFFhbq.s:4      *ABS*:0000003f __SREG__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccxFFhbq.s:5      *ABS*:00000000 __tmp_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccxFFhbq.s:6      *ABS*:00000001 __zero_reg__
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccxFFhbq.s:16     .text.set_keylog:00000000 set_keylog
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccxFFhbq.s:214    .rodata.code_to_name:00000000 code_to_name
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccxFFhbq.s:291    .bss.keylog_str:00000000 keylog_str
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccxFFhbq.s:279    .bss.keylogs_str_idx:00000000 keylogs_str_idx
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccxFFhbq.s:285    .bss.keylogs_str:00000000 keylogs_str
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccxFFhbq.s:173    .text.read_keylog:00000000 read_keylog
+C:\Users\nonej\Documents\Keyboard\msys64\tmp\ccxFFhbq.s:193    .text.read_keylogs:00000000 read_keylogs
+
+UNDEFINED SYMBOLS
+snprintf
+__do_copy_data
+__do_clear_bss
